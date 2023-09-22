@@ -1,0 +1,14 @@
+{
+  "name": "An Obsidian App",
+  "port": 3000,
+  "mode": "dev",
+  "no_imports": false,
+  "workers": {
+    "api": {
+      "port": 3001,
+      "path": "/api",
+      "enabled": true,
+      "restricted": false
+    }
+  }
+}

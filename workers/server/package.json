@@ -1,0 +1,15 @@
+{
+  "name": "obsidian-server",
+  "version": "1.0.0",
+  "description": "The rendering engine for the obsidian-engine",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node lib/tests/start.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
