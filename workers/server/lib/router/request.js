@@ -1,4 +1,5 @@
-// components/request.js
+const url = require("url");
+
 class Request {
   constructor(httpRequest) {
     this.method = httpRequest.method;
@@ -27,6 +28,16 @@ class Request {
       return JSON.parse(this.body);
     } catch (error) {
       return null;
+    }
+  }
+
+  params() {
+    // Parse the URL to get query parameters
+    const parsedUrl = url.parse(this.path, true);
+    if (parsedUrl.query) {
+      return parsedUrl.query;
+    } else {
+      return {};
     }
   }
 }

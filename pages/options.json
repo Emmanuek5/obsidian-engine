@@ -1,0 +1,9 @@
+{
+    "layout": "main",
+    "scripts": [
+        "home.js"
+    ],
+    "styles": [
+        "home.css"
+    ]
+}

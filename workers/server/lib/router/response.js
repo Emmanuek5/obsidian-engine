@@ -1,4 +1,6 @@
-
+const fs = require("fs");
+const path = require("path");
+const { RenderEngines } = require("../utils/Engines");
 // lib/response.js
 class Response {
   constructor(httpResponse) {
@@ -7,6 +9,7 @@ class Response {
     this.headers = {
       "Content-Type": "text/html", // Default content type is plain text
     };
+    this.mainPath = process.cwd() + "/pages";
     this.rendered = false;
     this.renderedFile = "";
     this.viewEngine = this.response.viewEngine;
@@ -28,14 +31,19 @@ class Response {
     this.response.writeHead(this.statusCode, this.headers);
     this.response.end(this.body);
     return this;
-    
   }
 
-  file(file) {
-    this.setHeader("Content-Type", "text/html");
-    this.body = fs.readFileSync(file, "utf8");
-    this.response.writeHead(this.statusCode, this.headers);
-    this.response.end(this.body);
+  file(filePath) {
+    if (fs.existsSync(filePath)) {
+      this.body = fs.readFileSync(filePath);
+      this.rendered = true;
+      this.setHeader("Content-Type", "application/octet-stream"); // Set the appropriate content type based on the file type
+      this.response.writeHead(this.statusCode, this.headers);
+      this.response.end(this.body);
+    } else {
+      // Handle the case where the file does not exist
+      this.status(404).send("File not found");
+    }
     return this;
   }
 
@@ -47,12 +55,29 @@ class Response {
     return this;
   }
 
-  render(file) {
-    
+  render(file, options) {
+    if (this.viewEngine) {
+     if (this.viewEngine == "html") {
+       const renderEngine = new RenderEngines();
+       const engine = renderEngine.getRenderer(this.viewEngine);
+       this.body = engine(file, options);
+       this.rendered = true;
+       this.setHeader("Content-Type", "text/html");
+       this.response.writeHead(this.statusCode, this.headers);
+       this.response.end(this.body);
+       return this;
+      
+     }
+    } else {
+      this.renderedFile = path.join(this.mainPath, file+".html");
+      this.rendered = true;
+      this.setHeader("Content-Type", "text/html");
+      this.body = fs.readFileSync(this.renderedFile, "utf8");
+      this.response.writeHead(this.statusCode, this.headers);
+      this.response.end(this.body);
+      return this;
+    }
   }
-
- 
-  
 }
 
 module.exports = {

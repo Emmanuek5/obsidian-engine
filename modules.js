@@ -1,7 +1,7 @@
-const { Config } = require("./workers/config/index");
-const { Server } = require("./workers/server/index");
-
+const { Config } = require('./workers');
+const server = require('./workers/server/index');
 module.exports = {
-  Config: Config,
-  Server: Server,
-};
+    server,
+    Config,
+}
+
