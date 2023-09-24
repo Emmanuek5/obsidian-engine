@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "nodemon scripts/test.js",
-    "start": "obsidian start"
+    "start": "obsidian start",
+    "build": "node .obsidian/scripts/build.js"
   },
   "keywords": [
     "render",

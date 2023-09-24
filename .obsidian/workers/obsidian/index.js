@@ -30,11 +30,12 @@ if (!args.length || !mode_types.includes(args[0])) {
   );
   process.exit(1);
 }else if(args[0] === "build"){
-  const builder = new Build(
-    path.join(workingPath, "pages"),
-    path.join(workingPath, "dist")
-  );
+  let start = new Date().getTime();
+  logger("Building Obsidian Engine " + new Date().toISOString());
+  const builder = new Build();
   builder.buildAllPages();
+  let end = new Date().getTime();
+  logger("Build Completed in " + (end - start) + "ms");
   process.exit(0);
 }
 
