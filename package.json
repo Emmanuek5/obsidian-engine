@@ -4,7 +4,8 @@
   "description": "A Super fast render engine for simple web developers",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon scripts/test.js"
+    "test": "nodemon scripts/test.js",
+    "start": "obsidian start"
   },
   "keywords": [
     "render",

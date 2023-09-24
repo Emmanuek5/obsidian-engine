@@ -6,7 +6,7 @@ class Request {
     this.path = httpRequest.url;
     this.headers = httpRequest.headers;
     this.body = "";
-
+    this.params = {};
     // Listen for data events to collect request body
     httpRequest.on("data", (chunk) => {
       this.body += chunk.toString();
@@ -31,15 +31,7 @@ class Request {
     }
   }
 
-  params() {
-    // Parse the URL to get query parameters
-    const parsedUrl = url.parse(this.path, true);
-    if (parsedUrl.query) {
-      return parsedUrl.query;
-    } else {
-      return {};
-    }
-  }
+
 }
 
 module.exports = {

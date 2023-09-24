@@ -31,14 +31,12 @@ if (!args.length || !mode_types.includes(args[0])) {
 
 mode = args[0];
 args[0] = "server/index.js";
-
 // Function to start the Node.js process
 function startNodeProcess() {
   if (processExited) {
     processExited = false;
     nodeProcess = spawn("node", args, { shell: true });
     logger("Process Started " + new Date().toISOString());
-
     nodeProcess.stdout.on("data", (data) => {
       console.log(
         COLORS.GREEN_TEXT +
@@ -63,20 +61,14 @@ function startNodeProcess() {
   }
 }
 
-// Watch for changes in specified file types
-const fileTypesToWatch = ["js", "ts", "json", "html", "css", "scss", "md"];
-const watcher = chokidar.watch(".", {
-  ignored: /node_modules/,
-  persistent: true,
-  awaitWriteFinish: true,
-});
-
-watcher.on("all", (event, filePath) => {
-  const fileType = path.extname(filePath).substring(1); // Get file extension
-  if (fileTypesToWatch.includes(fileType)) {
-    startNodeProcess(); // Start the Node.js process on file changes
+function stopNodeProcess() {
+  if (nodeProcess) {
+    logger("Process Stopped " + new Date().toISOString());
+    nodeProcess.kill();
   }
-});
+}
+
+// Watch for changes in specified file types
 
 // Check for Obsidian Engine build
 if (!fs.existsSync(path.join(workingPath, "obsidian.config.json"))) {

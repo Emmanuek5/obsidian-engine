@@ -35,8 +35,15 @@ class RenderEngines {
 
   htmlRenderer(file, options) {
     // Read the content of the view file
+    let content = "";
     const filePath = path.join(this.pagesPath, file + ".html");
-    let content = fs.readFileSync(filePath, "utf8");
+    if (!fs.existsSync(filePath)) {
+      const filePath = path.join(this.pagesPath, file + ".html");
+      content = `<h1>404</h1><p>File not found: ${filePath}</p>`;
+      return content;
+    }
+    
+    content = fs.readFileSync(filePath, "utf8");
     // Exclude the options.config property
     if (options.config) {
       delete options.config;
@@ -108,23 +115,26 @@ class RenderEngines {
 
       if (options.scripts.length > 0) {
         const scripts = options.scripts.map((script) => {
-          return `<script src="scripts/${script}"></script>`;
+          return `<script src="/scripts/${script}"></script>`;
         });
         // Add the scripts to the content without replacing anything
         content += scripts.join("\n");
       }
 
+      if (options.styles.length > 0) {
+        const styles = options.styles.map((style) => {
+          return `<link rel="stylesheet" href="/styles/${style}">`;
+        });
+        // Add the styles to the content without replacing anything
+        content += styles.join("\n");
+      }
+        
       // Return the content
       return content;
      
     }else {
       return content;
     }
-      
-  
-    
-    //return the content
-    return content;
   }
 }
 
