@@ -1,7 +1,7 @@
 {
   "name": "An Obsidian App",
   "view_engine": "html",
-  "port": 8000,
+  "port": 80,
   "mode": "dev",
   "no_imports": false,
   "workers": {

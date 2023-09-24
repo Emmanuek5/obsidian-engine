@@ -14,6 +14,9 @@
 ## Install
 
 ```sh
+git clone https://github.com/Emmanuek5/obsidian-engine.git
+```
+```sh
 npm install
 ```
 
