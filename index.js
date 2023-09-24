@@ -1,5 +1,6 @@
-const { Config, Router } = require("./workers");
-const server = require("./workers/server/index");
+const { Config, Router, } = require("./.obsidian/workers/server/index");
+const server = require("./.obsidian/workers/server/index");
+
 module.exports = {
   server,
   Config,

@@ -172,7 +172,7 @@ class RenderEngines {
 
   // Define the <link> tag for the favicon
   const faviconLinkTag =
-    '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
+    '<link rel="icon" type="image/x-icon" href="/pub/favicon.ico">';
 
   // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;
   return content.replace(headTagRegex, `${faviconLinkTag}</head>`);

@@ -42,7 +42,7 @@ class Response {
       this.response.end(this.body);
     } else {
       // Handle the case where the file does not exist
-      this.status(404).send("File not found");
+      this.setStatus(404).send("File not found");
     }
     return this;
   }

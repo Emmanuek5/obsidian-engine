@@ -28,7 +28,7 @@ class Build {
     const items = fs.readdirSync(sourcePath);
     items.forEach((item) => {
       const sourceItemPath = path.join(sourcePath, item);
-      const distItemPath = path.join(this.pagesdistDir, item);
+      let distItemPath = path.join(distPath, item);
       const stats = fs.statSync(sourceItemPath);
 
       if (stats.isDirectory()) {
@@ -36,10 +36,14 @@ class Build {
         if (!fs.existsSync(distItemPath)) {
           fs.mkdirSync(distItemPath, { recursive: true });
         }
-        // Recursively build pages in subdirectories
+        // Recursively build pages in subdirectories with the correct dist folder
         this.buildPages(sourceItemPath, distItemPath);
       } else if (stats.isFile() && path.extname(item) === ".html") {
         // If it's an HTML file, render and build the page
+        // Create a folder structure in the dist directory based on the source folder
+        const relativePath = path.relative(this.sourceDir, sourceItemPath);
+        const folderPath = path.dirname(relativePath);
+        distItemPath = path.join(this.pagesdistDir, folderPath, item);
         this.renderPage(sourceItemPath, distItemPath);
       }
     });
@@ -47,16 +51,20 @@ class Build {
 
   renderPage(sourceFilePath, distFilePath) {
     const relativePath = path.relative(this.sourceDir, sourceFilePath);
-    const parts = relativePath.split(path.sep); // Split the path by separator (e.g., / or \)
-    let fileName = parts.pop(); // Get the last part, which is the file name
-    const folderName = parts.join("/"); // Join the remaining parts as the folder name
+    const folderPath = path.dirname(relativePath); // Get the folder path
+
+    // Create the folder structure in the dist directory if it doesn't exist
+    const distFolder = path.join(this.pagesdistDir, folderPath);
+    if (!fs.existsSync(distFolder)) {
+      fs.mkdirSync(distFolder, { recursive: true });
+    }
 
     // Remove the file extension from the file name
-    fileName = path.basename(fileName, path.extname(fileName));
+    let fileName = path.basename(relativePath, path.extname(relativePath));
 
-    // If the folder name is not empty, prepend it to the file name
-    if (folderName !== "") {
-      fileName = `${folderName}/${fileName}`;
+    // If the folder path is not empty, prepend it to the file name
+    if (folderPath !== "") {
+      fileName = path.join(folderPath, fileName);
     }
 
     console.log(fileName);
@@ -70,8 +78,8 @@ class Build {
     this.copyFolder(this.scriptsDir, path.join(this.distDir, "scripts"));
   }
 
-  buildALLStyles(){
-        this.copyFolder(this.stylesDir, path.join(this.distDir, "styles"));
+  buildALLStyles() {
+    this.copyFolder(this.stylesDir, path.join(this.distDir, "styles"));
   }
 
   copyFolder(src, dest) {

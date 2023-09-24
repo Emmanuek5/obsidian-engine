@@ -1,4 +1,4 @@
-const { server, Config } = require("../../modules");
+const { server, Config, Router } = require("../../modules");
 const app = server();
 const config = new Config();
 const port = config.get("port");
@@ -7,7 +7,11 @@ const fs = require("fs");
 
 const defaultPath = process.cwd();
 const pagesPath = path.join(defaultPath, "pages");
-const routesPath = path.join(defaultPath, "routes");
+const routesPath = path.join(defaultPath, "api");
+
+process.env.VIEWS_PATH = path.join(defaultPath, "views");
+process.env.VIEW_ENGINE = config.get("view_engine");
+
 
 if (fs.existsSync(pagesPath) && fs.lstatSync(pagesPath).isDirectory()) {
   fs.readdirSync(pagesPath).forEach((folder) => {
@@ -57,6 +61,38 @@ function registerRoute(route, folder, fileName) {
   });
 }
 
+if (fs.existsSync(routesPath) && fs.lstatSync(routesPath).isDirectory()) {
+  fs.readdirSync(routesPath).forEach((file) => {
+    if (file.endsWith(".js")) {
+      const router = require(path.join(routesPath, file));
+      if (router instanceof Router) {
+        let basePath = router.basePath;
+        if (!basePath.startsWith("/")) {
+          basePath = `/${basePath}`;
+        }
+        app.use(
+          "/api/" + path.join(routesPath, file),
+          path.join(routesPath, file)
+        );
+      }else{
+        throw new Error("The router file must export a Router instance");
+      }
+    }
+  });
+}
+
+
+app.get("/favicon.ico", (req, res) => {
+  const faviconPath = path.join(process.cwd(), "public/favicon.ico");
+  if (fs.existsSync(faviconPath)) {
+    res.file(faviconPath);
+  }else{
+    const defaultFaviconPath = path.join(__dirname, "assets/favicon.ico");
+    console.log(defaultFaviconPath);
+    res.file(defaultFaviconPath);
+  }
+});
+app.use("/assets", path.join(process.cwd(), "/assets"));
 app.use("/public", path.join(process.cwd(), "/public"));
 app.use("/scripts", path.join(process.cwd(), "/public/js"));
 app.use("/styles", path.join(process.cwd(), "/public/css"));

@@ -15,6 +15,7 @@ class Server extends event.EventEmitter {
     this.on = eventEmitter.on;
     this.emit = eventEmitter.emit;
     this.viewEngine = viewEngine;
+   
   }
 
   handleRequest(req, res) {
