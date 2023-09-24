@@ -5,7 +5,6 @@ const chokidar = require("chokidar");
 const path = require("path");
 const fs = require("fs");
 const { COLORS } = require("./colours");
-const { Build } = require("..");
 
 
 const args = process.argv.slice(2);
@@ -29,18 +28,16 @@ if (!args.length || !mode_types.includes(args[0])) {
     COLORS.applyColor("Usage: obsidian dev | start | build", COLORS.RED_TEXT)
   );
   process.exit(1);
-}else if(args[0] === "build"){
-  let start = new Date().getTime();
-  logger("Building Obsidian Engine " + new Date().toISOString());
-  const builder = new Build();
-  builder.buildAllPages();
-  let end = new Date().getTime();
-  logger("Build Completed in " + (end - start) + "ms");
-  process.exit(0);
 }
 
 mode = args[0];
-args[0] = ".obsidian/server/index.js";
+args[0] = path.join(workingPath, ".obsidian/server/index.js");
+if (!fs.existsSync(path.join(workingPath, ".obsidian/server/index.js"))) {
+  console.error(
+    COLORS.applyColor("The Engine Was not installed correctly", COLORS.RED_TEXT)
+  );
+  process.exit(1);
+}
 // Function to start the Node.js process
 function startNodeProcess() {
   if (processExited) {
