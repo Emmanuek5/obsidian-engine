@@ -7,4 +7,5 @@ module.exports = {
     Config,
     Router,
     server,
+    Build: server.builder,
 }

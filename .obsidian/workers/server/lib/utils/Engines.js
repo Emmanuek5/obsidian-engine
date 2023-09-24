@@ -87,7 +87,6 @@ class RenderEngines {
     });
 
     if (!this.isFaviconinContent(content)) {
-      console.log("adding favicon");
      content = this.addFaviconToContent(content)
     }
 
@@ -172,10 +171,12 @@ class RenderEngines {
   const headTagRegex = /<\/head>/i;
 
   // Define the <link> tag for the favicon
-  const faviconLinkTag = '<link rel="icon" href="/favicon.ico">';
+  const faviconLinkTag =
+    '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
 
-  // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>
+  // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;
   return content.replace(headTagRegex, `${faviconLinkTag}</head>`);
+
 }
 
 }

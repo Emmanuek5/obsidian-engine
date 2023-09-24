@@ -5,7 +5,8 @@ const chokidar = require("chokidar");
 const path = require("path");
 const fs = require("fs");
 const { COLORS } = require("./colours");
-const { Builder } = require("../builder/index.js");
+const { Build } = require("..");
+
 
 const args = process.argv.slice(2);
 const mode_types = ["dev", "run", "build"];
@@ -21,12 +22,20 @@ const logger = (message) =>
       "ENGINE LOGS - " +
       COLORS.applyColor(message, COLORS.BLUE_TEXT)
   );
+  logger("Starting Obsidian Engine " + new Date().toISOString());
 
 if (!args.length || !mode_types.includes(args[0])) {
   console.error(
     COLORS.applyColor("Usage: obsidian dev | start | build", COLORS.RED_TEXT)
   );
   process.exit(1);
+}else if(args[0] === "build"){
+  const builder = new Build(
+    path.join(workingPath, "pages"),
+    path.join(workingPath, "dist")
+  );
+  builder.buildAllPages();
+  process.exit(0);
 }
 
 mode = args[0];

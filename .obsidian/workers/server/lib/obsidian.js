@@ -1,5 +1,6 @@
 const { App, Router, Server,Request, Response } = require("./application");
 const bodyParser = require("body-parser");
+const { Build } = require("./utils/builder");
 // Create an express-like application
 exports = module.exports = createApplication;
 
@@ -16,3 +17,4 @@ exports.static = require("serve-static");
 exports.text = bodyParser.text;
 exports.urlencoded = bodyParser.urlencoded;
 exports.json = bodyParser.json;
+exports.builder = Build;
