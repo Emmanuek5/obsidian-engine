@@ -1,4 +1,4 @@
-const { server, Config } = require("../modules");
+const { server, Config } = require("../../modules");
 const app = server();
 const config = new Config();
 const port = config.get("port");
@@ -7,6 +7,7 @@ const fs = require("fs");
 
 const defaultPath = process.cwd();
 const pagesPath = path.join(defaultPath, "pages");
+const routesPath = path.join(defaultPath, "routes");
 
 if (fs.existsSync(pagesPath) && fs.lstatSync(pagesPath).isDirectory()) {
   fs.readdirSync(pagesPath).forEach((folder) => {

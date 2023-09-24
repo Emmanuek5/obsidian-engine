@@ -30,7 +30,7 @@ if (!args.length || !mode_types.includes(args[0])) {
 }
 
 mode = args[0];
-args[0] = "server/index.js";
+args[0] = ".obsidian/server/index.js";
 // Function to start the Node.js process
 function startNodeProcess() {
   if (processExited) {

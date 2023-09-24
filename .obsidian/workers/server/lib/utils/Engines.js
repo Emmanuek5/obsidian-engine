@@ -36,13 +36,26 @@ class RenderEngines {
   htmlRenderer(file, options) {
     // Read the content of the view file
     let content = "";
+   
     const filePath = path.join(this.pagesPath, file + ".html");
+         const fileDir = path.dirname(filePath);
     if (!fs.existsSync(filePath)) {
       const filePath = path.join(this.pagesPath, file + ".html");
       content = `<h1>404</h1><p>File not found: ${filePath}</p>`;
       return content;
     }
-    
+      const optionsFilePath = path.join(fileDir, "options.json");
+      const defaultOptionsFilePath = path.join(this.pagesPath, "options.json");
+      if (fs.existsSync(optionsFilePath)) {
+        const optionsFile = fs.readFileSync(optionsFilePath, "utf8");
+        const optionsJson = JSON.parse(optionsFile);
+        options = Object.assign(options, optionsJson.render_options);
+
+      }else if (fs.existsSync(defaultOptionsFilePath)) {
+        const optionsFile = fs.readFileSync(defaultOptionsFilePath, "utf8");
+        const optionsJson = JSON.parse(optionsFile);
+        options = Object.assign(options, optionsJson.render_options);
+      }
     content = fs.readFileSync(filePath, "utf8");
     // Exclude the options.config property
     if (options.config) {
@@ -73,14 +86,18 @@ class RenderEngines {
       }
     });
 
+    if (!this.isFaviconinContent(content)) {
+      console.log("adding favicon");
+     content = this.addFaviconToContent(content)
+    }
+
     //lets check the directory where the file is located and get the options.json then get all the keys from the json then get the layout 
     //and render the layout with the options
     //get the layout file
     //read the layout file
 
-    const fileDir =  path.dirname(filePath);
-    const optionsFilePath = path.join(fileDir, "options.json");
-     const defaultOptionsFilePath = path.join(this.pagesPath, "options.json");
+
+  
     if (fs.existsSync(optionsFilePath)) {
       const optionsFile = fs.readFileSync(optionsFilePath, "utf8");
       const optionsJson = JSON.parse(optionsFile);
@@ -99,6 +116,15 @@ class RenderEngines {
         // Add the scripts to the content without replacing anything
         content += scripts.join("\n");
       }
+
+      if (options.styles.length > 0) {
+        const styles = options.styles.map((style) => {
+          return `<link rel="stylesheet" href="styles/${style}">`;
+        });
+        // Add the styles to the content without replacing anything
+        content += styles.join("\n");
+      }
+
 
       // Return the content
       return content;
@@ -136,6 +162,22 @@ class RenderEngines {
       return content;
     }
   }
+
+
+  isFaviconinContent(content) {
+    return content.includes("<link rel=\"icon\" href=\"");
+  }
+ addFaviconToContent(content) {
+  // Create a regular expression to find the </head> tag in a case-insensitive manner
+  const headTagRegex = /<\/head>/i;
+
+  // Define the <link> tag for the favicon
+  const faviconLinkTag = '<link rel="icon" href="/favicon.ico">';
+
+  // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>
+  return content.replace(headTagRegex, `${faviconLinkTag}</head>`);
+}
+
 }
 
 module.exports = {
