@@ -2,8 +2,11 @@ const { Router } = require("../modules");
 const router = new Router();
 
 
-router.basePath = "/api";
+router.basePath = "/";
 
+router.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 
 
 module.exports = router;
