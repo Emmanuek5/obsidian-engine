@@ -1,13 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><<$title>></title>
-</head>
-<body>
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title><<$name>></title>
+   </head>
+   <style>
+      /* Reset some default styles */
+      body, h1, h2, p {
+         margin: 0;
+         padding: 0;
+      }
 
-    <h1><<$name>></h1>
-    <</div>>
-</body>
+      /* Set a background color and font for the body */
+      body {
+         font-family: Arial, sans-serif;
+         background-color: #000; /* Change background color to black */
+         color: #fff; /* Change text color to white */
+      }
+
+      /* Style the header */
+      header {
+         background-color: #000; /* Change header background color to black */
+         padding: 20px;
+         text-align: center;
+         display: flex; /* Use flexbox to align items horizontally */
+         align-items: center; /* Center items vertically within the header */
+         justify-content: center; /* Center items horizontally within the header */
+         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      }
+
+      header img {
+         width: 100px;
+         height: 100px;
+         margin-right: 10px;
+         border: 3px solid #00bcd4; /* Add a border around the logo with cyan color */
+      }
+
+      header h1 {
+         font-size: 36px;
+         color: #00bcd4; /* Change the header text color to cyan */
+      }
+
+      /* Style the top-page section */
+      .top-page {
+         text-align: center;
+         padding: 20px;
+      }
+
+      .top-page h1 {
+         font-size: 36px;
+      }
+
+      .top-page h2 {
+         font-size: 24px;
+      }
+
+      .description p {
+         font-size: 18px;
+      }
+
+      /* Style code sections */
+      .example_code {
+         padding: 20px;
+         background-color: #333; /* Change code section background color to dark blue */
+         border-radius: 5px;
+         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+         margin-top: 20px;
+      }
+
+      /* Style individual code blocks */
+      .code_block {
+         background-color: #222; /* Change code block background color to black */
+         border-radius: 5px;
+         margin: 20px 0;
+         padding: 20px;
+      }
+
+      .code_block h4 {
+         font-size: 24px; /* Increase font size for better readability */
+         color: #00bcd4; /* Change heading color to cyan */
+      }
+
+      pre {
+         font-family: monospace;
+         white-space: pre-wrap;
+         background-color: #333; /* Change code block background color to dark blue */
+         padding: 15px; /* Increase padding for better readability */
+         border-radius: 5px;
+         color: #fff; /* Change code text color to white */
+      }
+
+      a {
+         color: #00bcd4; /* Change link color to cyan */
+         text-decoration: none;
+      }
+
+      a:hover {
+         text-decoration: underline;
+      }
+
+      /* Make the page responsive */
+      @media screen and (max-width: 768px) {
+         header {
+            flex-direction: column; /* Stack items vertically on smaller screens */
+            align-items: center; /* Center items vertically within the header */
+         }
+
+         header img {
+            margin-bottom: 10px; /* Add spacing between the image and name */
+         }
+      }
+   </style>
+   <body>
+      <header>
+         <div class="header__title">
+            <img src="/assets/logo.png" alt="logo" >
+            <h1><<$title>></h1>
+         </div>
+      </header>
+      <div class="top-page">
+         <div class="top-page__title">
+            <h1>Hello There!</h1>
+         </div>
+         <div class="top-page__subtitle">
+            <h2>Welcome to a new world</h2>
+         </div>
+         <div class="description">
+            <p>This is a new world of simple, fast and Easy to use rendering engines</p>
+            <h>To Change this page go to /pages/index.html</h>
+         </div>
+      </div>
+      <div class="selector">
+    
+      </div>
+      <div class="example_code client_code" id="client_code">
+         <div class="code_block _1" id="components">
+            <h4>To use components in the html file use  &lt;&lt;/component>> </h4>
+            <p>Example</p>
+            <pre>
+                &lt;div class="custom-div"&gt;
+                    &lt;&lt;/component>><br>
+                    &lt;&lt;/component>><br>
+                    &lt;&lt;/component>><br>
+                &lt;/div&gt;
+            </pre>
+            <p>The components are called by file name in the /components folder</p>
+         </div>
+         <div class="code_block _2" id="options">
+            <h4>The options.json is placed in the pages folder or u can place custom ones in a sub path </h4>
+            <p>This is an example /options.json</p>
+            <pre>
+            {
+    "layout": "main",
+    "scripts": [
+        "home.js"
+    ],
+    "styles": [
+        "home.css"
+    ],
+    "render_options": {
+        "title": "Home",
+        "name": "Obsidian Engine"
+    }
+}
+        </pre>
+            <p>The layout is defined in the /layouts folder</p>
+            <p>render_options is used to define variables that can be used in a html file <a href="#variables">Go There</a></p>
+            <p>The styles are the styles that you want to use in every rendered file using the options.json, They are defined in the public/css </p>
+            <p>The scripts are the scripts that you want to use in every rendered file using the options.json, They are defined in the public/js </p>
+         </div>
+         <div class="code_block _3" id="layouts">
+            <h4>The layouts are found by file name so if we want the main layout we use layouts/main</h4>
+            <p>Example</p>
+            <pre>
+            &lt;!DOCTYPE html&gt;
+            &lt;html lang="en"&gt;
+            &lt;head&gt;
+                &lt;meta charset="UTF-8"&gt;
+                &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+                &lt;title>&lt;&lt;title>>&lt;/title&gt;
+                &lt;link rel="stylesheet" href="css/style.css"&gt;
+                &lt;script src="js/script.js"&gt;&lt;/script&gt;
+            &lt;/head&gt;
+            &lt;body&gt;
+                &lt;div class="main"&gt;
+                    &lt;div class="header"&gt;
+                        &lt;div class="header__title"&gt;
+                            &lt;h1>&lt;&lt;title>>&lt;/h1&gt;
+                        &lt;/div&gt;
+                        &lt;div class="header__subtitle"&gt;
+                            &lt;h2>&lt;&lt;subtitle>>&lt;/h2&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="content"&gt;
+                        &lt;&lt;$content>> //This is where the content of the pages that use the layout is rendered
+                    &lt;/div&gt;
+                    &lt;div class="footer"&gt;
+                        &lt;div class="footer__description"&gt;
+                            &lt;p>&lt;&lt;description>>&lt;/p&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/body&gt;
+            &lt;/html&gt;
+        </pre>
+            <p>
+               The &lt;&lt;$content>> is used to render the content of the pages that use the layout
+            </p>
+         </div>
+         <div class="code_block _4" id="variables">
+            <h4>The variables are defined in the options.json file and can also be defined in the query params so /route?param1=dwd </h4>
+            <p>Example</p>
+            <pre>
+            &lt;&lt;$title>>
+        </pre>
+            <p>
+               To use the variables in the html file use &lt;&lt;$variable_name>> 
+            </p>
+            <p>Note: The variables are defined in the options.json file and can also be defined in the query params so /route?param1=dwd </p>
+            <p>And if a variable is not found in the options.json or the query params it will not  be changed</p>
+         </div>
+         <div class="code_block _5" id="components">
+            <h4>To use components in the html file use  &lt;&lt;/component>> </h4>
+            <p>Example component</p>
+            <pre>
+            &lt;div class="custom-div"&gt;
+              This is a custom div component.
+            &lt;/div&gt;
+        </pre>
+            <p>The components are called by file name in the /components folder</p>
+         </div>
+      </div>
+
+      <div class="example_code server_code" id="server_code">
+        <div class="code_block">
+            <h4>To Add a new route to the /api base route (e.g /api/open etc)</h4>
+        </div>
+      </div>
+
+   </body>
 </html>
