@@ -99,7 +99,33 @@
       a:hover {
          text-decoration: underline;
       }
+ /* Add styles for the button container */
+   .selector {
+      text-align: center;
+      margin-top: 20px;
+   }
 
+   /* Style the buttons */
+   .selector button {
+      background-color: #00bcd4; /* Button background color */
+      color: #fff; /* Button text color */
+      border: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-right: 10px; /* Add some spacing between buttons */
+      border-radius: 5px;
+   }
+
+   
+   selector button.active {
+      background-color: #00bcd4; /* Active button background color */
+   }
+
+   /* Style the non-active button */
+   .selector button:not(.active) {
+      background-color: #333; /* Non-active button background color */
+   }
       /* Make the page responsive */
       @media screen and (max-width: 768px) {
          header {
@@ -132,6 +158,8 @@
          </div>
       </div>
       <div class="selector">
+         <button class="client_code" id="client_code">Client</button>
+         <button class="server_code" id="server_code">Server</button>
     
       </div>
       <div class="example_code client_code" id="client_code">
@@ -238,6 +266,26 @@
             <h4>To Add a new route to the /api base route (e.g /api/open etc)</h4>
         </div>
       </div>
+<script>
+         // JavaScript to toggle code sections based on button click
+         const clientCodeButton = document.getElementById("client_code");
+         const serverCodeButton = document.getElementById("server_code");
+         const clientCodeSection = document.querySelector(".example_code.client_code");
+         const serverCodeSection = document.querySelector(".example_code.server_code");
 
+         clientCodeButton.addEventListener("click", () => {
+            clientCodeSection.style.display = "block";
+            serverCodeSection.style.display = "none";
+            clientCodeButton.classList.add("active");
+            serverCodeButton.classList.remove("active");
+         });
+
+         serverCodeButton.addEventListener("click", () => {
+            clientCodeSection.style.display = "none";
+            serverCodeSection.style.display = "block";
+            clientCodeButton.classList.remove("active");
+            serverCodeButton.classList.add("active");
+         });
+      </script>
    </body>
 </html>
