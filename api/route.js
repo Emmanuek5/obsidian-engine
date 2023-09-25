@@ -1,19 +1,13 @@
 const { Router } = require("../modules");
 const router = new Router();
-const usersModel = require("../models/users");
 
 
-usersModel.insert({
-  username: "admin",
-  password: "admin",
-  email: "  ",
-});
 
+//visit http://localhost:3000/api/
 router.basePath = "/";
 
 router.get("/", (req, res) => {
-  const user = usersModel.find({username: "admin"})
-  res.send(user.toString());
+  res.send("Hello World");
 });
 
 

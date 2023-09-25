@@ -250,23 +250,19 @@ class Table extends EventEmitter {
 
   find(query) {
     const results = [];
-
     for (const row of this.data) {
       let match = true;
-
       for (const key in query) {
         if (row[key] !== query[key]) {
           match = false;
-          break;
+          break; // Break the inner loop as soon as a mismatch is found
         }
       }
-
       if (match) {
-        results.push(row);
+        results.push(JSON.stringify(row)); // Stringify the row before pushing it
       }
     }
-
-    return results;
+    return JSON.parse(results);
   }
 
   findAndUpdate(query, update) {
