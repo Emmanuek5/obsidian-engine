@@ -1,0 +1,24 @@
+{
+    "tables": {
+        "posts": {
+            "data": []
+        },
+        "comments": {
+            "data": []
+        },
+        "users": {
+            "data": [
+                {
+                    "id": 1,
+                    "name": "John Doe",
+                    "age": 20
+                },
+                {
+                    "id": 2,
+                    "name": "Jane Doe",
+                    "age": 21
+                }
+            ]
+        }
+    }
+}

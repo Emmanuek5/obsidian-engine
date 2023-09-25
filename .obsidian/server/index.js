@@ -1,16 +1,33 @@
-const { server, Config, Router } = require("../../modules");
+const { server, Config, Router,Table } = require("../../modules");
 const app = server();
 const config = new Config();
 const port = config.get("port");
 const path = require("path");
 const fs = require("fs");
-
+const { Database } = require("../workers/database");
 const defaultPath = process.cwd();
 const pagesPath = path.join(defaultPath, "pages");
 const routesPath = path.join(defaultPath, "api");
+const tablesPath = path.join(defaultPath, "models");
 
+const database = new Database("database");
 process.env.VIEWS_PATH = path.join(defaultPath, "views");
 process.env.VIEW_ENGINE = config.get("view_engine");
+
+if (fs.existsSync(tablesPath) && fs.lstatSync(tablesPath).isDirectory()) {
+  fs.readdirSync(tablesPath).forEach((file) => {
+    if (file.endsWith(".js")) {
+      const table = require(path.join(tablesPath, file));
+      if (table instanceof Table) {
+        let tableName = table.name;
+        if (tableName === "") {
+          console.error("Table name is not defined");
+        }
+        database.add(table);
+      } else {}
+      
+    }});
+}
 
 if (fs.existsSync(routesPath) && fs.lstatSync(routesPath).isDirectory()) {
   fs.readdirSync(routesPath).forEach((file) => {
