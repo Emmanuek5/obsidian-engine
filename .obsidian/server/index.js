@@ -29,6 +29,8 @@ if (fs.existsSync(routesPath) && fs.lstatSync(routesPath).isDirectory()) {
       }
     }
   });
+}else{
+  console.log("No api folder found");
 }
 
 if (fs.existsSync(pagesPath) && fs.lstatSync(pagesPath).isDirectory()) {

@@ -117,7 +117,7 @@
       border-radius: 5px;
    }
 
-   
+
    selector button.active {
       background-color: #00bcd4; /* Active button background color */
    }
@@ -158,7 +158,7 @@
          </div>
       </div>
       <div class="selector">
-         <button class="client_code" id="client_code">Client</button>
+         <button class="client_code active" id="client_code">Client</button>
          <button class="server_code" id="server_code">Server</button>
     
       </div>
@@ -264,7 +264,26 @@
       <div class="example_code server_code" id="server_code">
         <div class="code_block">
             <h4>To Add a new route to the /api base route (e.g /api/open etc)</h4>
+            <p>Example</p>
+            <pre>
+               const { Router } = require("../modules");
+               const router = new Router();
+
+ 
+             router.basePath = "/";
+
+          router.get("/", (req, res) => {
+           res.send("Hello World!");
+           });
+
+
+         module.exports = router;
+         </pre>
+               <p>To define a route place the file in the /api folder </p>
+               <p>The router.basePath defines the main path of the router file</p>
+               <p>The router.get defines the method and the path of the route</p>
         </div>
+
       </div>
 <script>
          // JavaScript to toggle code sections based on button click
