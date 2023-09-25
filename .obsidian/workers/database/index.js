@@ -33,7 +33,9 @@ class Database {
     const data = {
       tables: {},
     };
-
+    if (!fs.existsSync(path.join(__dirname + "/data"))) {
+      fs.mkdirSync(path.join(__dirname + "/data"));
+    }
     for (const tableName in this.tables) {
       data.tables[tableName] = this.tables[tableName].toJSON();
     }
