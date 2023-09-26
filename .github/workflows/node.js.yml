@@ -30,3 +30,4 @@ jobs:
     - run: npm run build --if-present
     - run: rm -rf node_modules
     - run: rm -rf dist
+    - run: li

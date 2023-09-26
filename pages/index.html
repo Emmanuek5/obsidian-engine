@@ -34,7 +34,7 @@
          width: 100px;
          height: 100px;
          margin-right: 10px;
-         border: 3px solid #00bcd4; /* Add a border around the logo with cyan color */
+        border-radius: 50%;
       }
 
       header h1 {
@@ -117,6 +117,11 @@
       border-radius: 5px;
    }
 
+   .code_block ol {
+      margin-left: 20px;
+   }
+
+
 
    selector button.active {
       background-color: #00bcd4; /* Active button background color */
@@ -139,6 +144,7 @@
       }
    </style>
    <body>
+    <div class="base-header">  
       <header>
          <div class="header__title">
             <img src="/assets/logo.png" alt="logo" >
@@ -162,6 +168,8 @@
          <button class="server_code" id="server_code">Server</button>
     
       </div>
+   </div>
+      
       <div class="example_code client_code" id="client_code">
          <div class="code_block _1" id="components">
             <h4>To use components in the html file use  &lt;&lt;/component>> </h4>
@@ -259,6 +267,28 @@
         </pre>
             <p>The components are called by file name in the /components folder</p>
          </div>
+         <div class="code_block" id="animations">
+            <h4>Animations  Can be used in the JavaScript file </h4>
+            <p>Example:</p>
+            <pre>
+               const element = document.querySelector(".custom-div");
+               fadeIn(element, 1000);
+               fadeOut(element, 1000);
+               slideIn(element, 1000);
+               slideOut(element, 1000);
+         </pre>
+         <p>These are the animations that can be used</p>
+            <ol>
+               <li>fadeIn(element, duration)</li>
+               <li>fadeOut(element, duration)</li>
+               <li>slideIn(element, duration)</li>
+               <li>slideOut(element, duration)</li>
+               <li>slideLeft(element, duration)</li>
+               <li>slideRight(element, duration)</li>
+               <li>slideUp(element, duration)</li>
+               <li>slideDown(element, duration)</li>
+            </ol>
+         </div>
       </div>
 
       <div class="example_code server_code" id="server_code">
@@ -295,6 +325,8 @@
          clientCodeButton.addEventListener("click", () => {
             clientCodeSection.style.display = "block";
             serverCodeSection.style.display = "none";
+            fadeIn(clientCodeSection, 1000);
+            fadeOut(serverCodeSection, 1000);
             clientCodeButton.classList.add("active");
             serverCodeButton.classList.remove("active");
          });
@@ -302,6 +334,9 @@
          serverCodeButton.addEventListener("click", () => {
             clientCodeSection.style.display = "none";
             serverCodeSection.style.display = "block";
+            fadeOut(clientCodeSection, 1000);
+            slideIn(serverCodeSection, 1000);
+            fadeIn(serverCodeSection, 1000);
             clientCodeButton.classList.remove("active");
             serverCodeButton.classList.add("active");
          });

@@ -1,1 +1,3 @@
-console.log("Hello World");
+const es = document.querySelector("div");
+
+ fadeIn(es, 1000);
