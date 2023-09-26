@@ -14,9 +14,10 @@ table.setSchema({
     email: {
         type: "string",
         required: true,
+        unique: true
     },
     });
 
-    
+
 module.exports = table;
 

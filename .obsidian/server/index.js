@@ -119,5 +119,9 @@ app.post("/", (req, res) => {
 });
 
 app.listen(port, (port) => {
-  console.log(`Server listening on http://localhost:${port}`);
+  if (port === 80) {
+    console.log(`Server listening on http://localhost/`);
+  }else{
+    console.log(`Server listening on http://localhost:${port}`);
+  }
 });
