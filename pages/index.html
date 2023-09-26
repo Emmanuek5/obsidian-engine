@@ -323,6 +323,7 @@
          const serverCodeSection = document.querySelector(".example_code.server_code");
 
          clientCodeButton.addEventListener("click", () => {
+            pulse(clientCodeButton, 1000)
             clientCodeSection.style.display = "block";
             serverCodeSection.style.display = "none";
             fadeIn(clientCodeSection, 1000);
@@ -332,6 +333,7 @@
          });
 
          serverCodeButton.addEventListener("click", () => {
+            pulse(serverCodeButton, 1000)
             clientCodeSection.style.display = "none";
             serverCodeSection.style.display = "block";
             fadeOut(clientCodeSection, 1000);
