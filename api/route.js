@@ -1,5 +1,6 @@
 const { Router } = require("../modules");
 const router = new Router();
+const usersModel = require("../models/users");
 
 
 

@@ -185,9 +185,8 @@ class Database {
 }
 
 class Table extends EventEmitter {
-  // Extend EventEmitter
   constructor() {
-    super(); // Call the constructor of the EventEmitter class
+    super();
     this.data = [];
     this.name = "";
     this.schema = {}; // Store the table schema as an object
@@ -195,19 +194,18 @@ class Table extends EventEmitter {
 
   addId() {
     let id = 1;
-
     for (const row of this.data) {
       row.id = id;
       id++;
     }
   }
 
-  // Set the table schema
+  // Set the table schema with unique constraints
   setSchema(schema) {
     this.schema = schema;
   }
 
-  // Insert a row into the table
+  // Insert a row into the table with uniqueness check
   insert(row) {
     // Validate that the inserted row matches the schema
     const schemaKeys = Object.keys(this.schema);
@@ -225,11 +223,27 @@ class Table extends EventEmitter {
         );
         return;
       }
+
+      if (this.schema[key].unique) {
+        // Check uniqueness for columns marked as unique
+        const isUnique = !this.data.some(
+          (existingRow) => existingRow[key] === row[key]
+        );
+
+        if (!isUnique) {
+            
+          console.error(
+            `Column '${key}' must be unique, but a duplicate value exists.`
+          );
+           return false;
+        }
+      }
     }
 
     this.data.push(row);
     this.addId();
     this.emit("save");
+    return true;
     // Emit the 'save' event after inserting a row
   }
 
@@ -293,6 +307,9 @@ class Table extends EventEmitter {
     // Emit the 'save' event after deleting a row
   }
 }
+
+module.exports = Table;
+
 
 module.exports = {
   Database,
