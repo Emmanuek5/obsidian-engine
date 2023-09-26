@@ -27,7 +27,6 @@ class Request {
   static query = this.query;
   static params = this.params;
   static files = this.files;
-  static file = this.files[0];
   
   getFilesFromRequest() {
     const files = [];
