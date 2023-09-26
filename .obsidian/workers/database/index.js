@@ -3,7 +3,9 @@ const mysql = require("mysql");
 const mongoose = require("mongoose");
 const path = require("path");
 const EventEmitter = require("events"); // Import the EventEmitter module
-
+const express = require("express");
+const bodyParser = require("body-parser");
+const axios = require("axios");
 class Database {
   constructor(dbName) {
     this.dbName = dbName;
@@ -21,6 +23,13 @@ class Database {
     }
   }
 
+
+
+  /**
+   * Get a table by name
+   * @param {string} tableName
+   * @returns {Table}
+   * */
   getTable(tableName) {
     return this.tables[tableName];
   }

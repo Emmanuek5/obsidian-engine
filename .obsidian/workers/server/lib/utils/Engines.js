@@ -194,6 +194,23 @@ class RenderEngines {
         );
       `,
       },
+      pulse : {
+        parameters: ["element", "duration"],
+        code: `
+        element.animate(
+          [
+            { transform: "scale(1)" },
+            { transform: "scale(1.2)" },
+            { transform: "scale(1)" }
+          ],
+          { 
+            duration: duration,
+            iterations: 1, // Play the animation just once
+          }
+        );
+      `,
+      },
+      
    };
 
 
