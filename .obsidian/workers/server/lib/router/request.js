@@ -7,7 +7,6 @@ class Request {
     this.headers = httpRequest.headers;
     this.body = "";
     this.params = {};
-    this.query = url.parse(this.path, true).query;
     this.files = [];  
     // Listen for data events to collect request body
     httpRequest.on("data", (chunk) => {
@@ -24,7 +23,6 @@ class Request {
   static headers = this.headers;
   static method = this.method;
   static path = this.path;
-  static query = this.query;
   static params = this.params;
   static files = this.files;
   
