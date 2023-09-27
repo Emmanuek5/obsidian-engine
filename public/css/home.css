@@ -1,0 +1,245 @@
+/* Reset some default styles */
+body,
+h1,
+h2,
+p {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Set the background color and font for the body */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #212F3D;
+    /* Slightly Darker Blue-Gray background color */
+    color: #FFFFFF;
+    /* White text color */
+}
+
+/* Style the header */
+header {
+    background-color: #212F3D;
+    /* Slightly Darker Blue-Gray header color */
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    /* Use flexbox to align items horizontally */
+    align-items: center;
+    /* Center items vertically within the header */
+    justify-content: center;
+    /* Center items horizontally within the header */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+header img {
+    width: 100px;
+    height: 100px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+header h1 {
+    font-size: 36px;
+    color: #FFFFFF;
+    /* White header text color */
+}
+
+/* Style the top-page section */
+.top-page {
+    text-align: center;
+    padding: 20px;
+}
+
+.top-page h1 {
+    font-size: 36px;
+}
+
+.top-page h2 {
+    font-size: 24px;
+}
+
+.description p {
+    font-size: 18px;
+}
+
+/* Style code sections */
+.example_code {
+    background-color: #34495e;
+    /* Darker Blue code section background color */
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+    margin-left: 260px;
+    /* Adjust this value as needed */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Style individual code blocks */
+.code_block {
+    background-color: #2E86C1;
+    /* Dark Blue code block background color */
+    border-radius: 5px;
+    margin: 20px 0;
+    padding: 20px;
+}
+
+.code_block h4 {
+    font-size: 24px;
+    /* Increase font size for better readability */
+    color: #ECF0F1;
+    /* Light Gray heading color */
+}
+
+pre {
+    font-family: monospace;
+    white-space: pre-wrap;
+    background-color: #34495e;
+    /* Darker Blue code block background color */
+    padding: 15px;
+    /* Increase padding for better readability */
+    border-radius: 5px;
+    color: #FFFFFF;
+    /* White code text color */
+}
+
+a {
+    color: #3498db;
+    /* Lighter Blue link color */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Add styles for the button container */
+.selector {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Style the buttons */
+.selector button {
+    background-color: #34495e;
+    /* Darker Blue button background color */
+    color: #FFFFFF;
+    /* White button text color */
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-right: 10px;
+    /* Add some spacing between buttons */
+    border-radius: 5px;
+}
+
+.selector button.active {
+    background-color: #2E86C1;
+    /* Dark Blue active button background color */
+    color: #ECF0F1;
+    /* Light Gray active button text color */
+}
+
+/* Style the non-active button */
+.selector button:not(.active) {
+    background-color: #34495e;
+    /* Darker Blue non-active button background color */
+    color: #FFFFFF;
+    /* White non-active button text color */
+}
+
+/* Style the sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #212F3D;
+    /* Slightly Darker Blue-Gray sidebar background color */
+    color: #FFFFFF;
+    /* White sidebar text color */
+    padding-top: 20px;
+    z-index: 1;
+    /* Ensure the sidebar is above other content */
+}
+
+.sidebar a {
+    color: #FFFFFF;
+    /* White link color */
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+}
+
+.sidebar a:hover {
+    background-color: #2E86C1;
+    /* Dark Blue link hover background color */
+}
+
+.sidebar .mode-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.sidebar .mode-buttons button {
+    color: #FFFFFF;
+    /* White button text color */
+    border: none;
+    padding: 5px 10px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.sidebar .nav-item {
+    margin: 5px;
+}
+
+.sidebar .nav-item .active {
+    background-color: #2E86C1;
+    /* Dark Blue active button background color */
+}
+
+.sidebar .nav-item .active:hover {
+    /* Increase the size of the active button */
+    padding: 10px;
+}
+
+.sidebar .nav-item:not(.active) {
+    /* Add your styles here */
+    color: #999999;
+    /* Example text color for inactive items */
+    background-color: #212F3D;
+    /* Example background color for inactive items */
+    /* Add any other styles you want for inactive items */
+}
+
+/* Hide the server code by default */
+.server_code {
+    display: none;
+}
+
+.active {
+    background-color: #2E86C1;
+    /* Dark Blue active element background color */
+    color: #ECF0F1;
+    /* Light Gray active element text color */
+}
+
+.server-mode_sidebar {
+    display: none;
+}
+
+.client-mode_sidebar {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+}

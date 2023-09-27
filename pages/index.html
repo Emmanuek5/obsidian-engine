@@ -11,211 +11,6 @@
     <title><<$title>></title>
 </head>
 <style>
-    /* Reset some default styles */
-    body, h1, h2, p {
-        margin: 0;
-        padding: 0;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    /* Set a background color and font for the body */
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #000; /* Change background color to black */
-        color: #fff; /* Change text color to white */
-    }
-
-    /* Style the header */
-    header {
-        background-color: #000; /* Change header background color to black */
-        padding: 20px;
-        text-align: center;
-        display: flex; /* Use flexbox to align items horizontally */
-        align-items: center; /* Center items vertically within the header */
-        justify-content: center; /* Center items horizontally within the header */
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    }
-
-    header img {
-        width: 100px;
-        height: 100px;
-        margin-right: 10px;
-        border-radius: 50%;
-    }
-
-    header h1 {
-        font-size: 36px;
-        color: #00bcd4; /* Change the header text color to cyan */
-    }
-
-    /* Style the top-page section */
-    .top-page {
-        text-align: center;
-        padding: 20px;
-    }
-
-    .top-page h1 {
-        font-size: 36px;
-    }
-
-    .top-page h2 {
-        font-size: 24px;
-    }
-
-    .description p {
-        font-size: 18px;
-    }
-
-    /* Style code sections */
-    .example_code {
-        background-color: #333; /* Change code section background color to dark blue */
-        border-radius: 5px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        margin-top: 20px;
-          margin-left: 260px; /* Adjust this value as needed */
-    padding: 20px;
-    box-sizing: border-box;
-    }
-
-    /* Style individual code blocks */
-    .code_block {
-        background-color: #222; /* Change code block background color to black */
-        border-radius: 5px;
-        margin: 20px 0;
-        padding: 20px;
-    }
-
-    .code_block h4 {
-        font-size: 24px; /* Increase font size for better readability */
-        color: #00bcd4; /* Change heading color to cyan */
-    }
-
-    pre {
-        font-family: monospace;
-        white-space: pre-wrap;
-        background-color: #333; /* Change code block background color to dark blue */
-        padding: 15px; /* Increase padding for better readability */
-        border-radius: 5px;
-        color: #fff; /* Change code text color to white */
-    }
-
-    a {
-        color: #00bcd4; /* Change link color to cyan */
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-
-    /* Add styles for the button container */
-    .selector {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    /* Style the buttons */
-    .selector button {
-         background-color: #333; /* Button background color */
-        color: #fff; /* Button text color */
-        border: none;
-        padding: 10px 20px;
-        font-size: 18px;
-        cursor: pointer;
-        margin-right: 10px; /* Add some spacing between buttons */
-        border-radius: 5px;
-    }
-
-    .selector button.active {
-        background-color: #00bcd4; /* Active button background color */
-    }
-
-    /* Style the non-active button */
-    .selector button:not(.active) {
-        background-color: #333; /* Non-active button background color */
-    }
-
-/* Style the sidebar */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 250px;
-    height: 100%;
-    background-color: #343a40;
-    color: #fff;
-    padding-top: 20px;
-    z-index: 1; /* Ensure the sidebar is above other content */
-}
-    .sidebar a {
-        color: #fff;
-        text-decoration: none;
-        display: block;
-        padding: 10px;
-    }
-
-    .sidebar a:hover {
-        background-color: #00bcd4;
-    }
-
-    .sidebar .mode-buttons {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .sidebar .mode-buttons button {
-        color: #fff;
-        border: none;
-        padding: 5px 10px;
-        margin: 5px;
-        cursor: pointer;
-    }
-
-    .sidebar .nav-item {
-        margin: 5px;
-    }
-
-    .sidebar .nav-item .active {
-        background-color: #00bcd4;
-    }
-
-      .sidebar .nav-item .active:hover {
-     /* increase the size of the active button */
-        padding: 10px;
-
-      }
-
-    .sidebar .nav-item:not(.active) {
-    /* Add your styles here */
-    color: #999; /* Example text color for inactive items */
-    background-color: #333; /* Example background color for inactive items */
-    /* Add any other styles you want for inactive items */
-}
-    /* Hide the server code by default */
-.server_code {
-    display: none;
-}
-
-.active {
-    background-color: #00bcd4;
-}
-
-.server-mode_sidebar {
-    display: none;
-}
-
-.client-mode_sidebar {
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        display: none;
-    }
-    
-}
 
 </style>
 <body>
@@ -226,8 +21,7 @@
             <h1><<$name>></h1>
             
         </div>
-    </header>
-    <div class="top-page">
+         <div class="top-page">
         <div class="top-page__title">
             <h1>Hello There!</h1>
         </div>
@@ -239,6 +33,8 @@
             <p>To Change this page go to /pages/index.html</p>
         </div>
     </div>
+    </header>
+   
 </div>
 
 <div class="container-fluid">
