@@ -38,46 +38,57 @@
 </div>
 
 <div class="container-fluid">
-    <nav class="sidebar">
-        <div class="mode-buttons selector ">
-            <button class="client-mode active">Client Mode</button>
-           <button class="server-mode">Server Mode</button>
-        </div>
-        <ul class="nav flex-column client-mode client-mode_sidebar">
-            <li class="nav-item client_buttons active">
-                <a class="nav-link" href="#components">
-                    <i class="fas fa-cogs"></i> Components
-                </a>
-            </li>
-            <li class="nav-item client_buttons">
-                <a class="nav-link" href="#options">
-                    <i class="fas fa-cogs"></i> Options
-                </a>
-            </li>
-            <li class="nav-item client_buttons">
-                <a class="nav-link" href="#layouts">
-                    <i class="fas fa-cogs"></i> Layouts
-                </a>
-            </li>
-            <li class="nav-item client_buttons">
-                <a class="nav-link" href="#variables">
-                    <i class="fas fa-cogs"></i> Variables
-                </a>
-            </li>
-            <li class="nav-item client_buttons">
-                <a class="nav-link" href="#animations">
-                    <i class="fas fa-cogs"></i> Animations
-                </a>
-            </li>
-        </ul>
-         <ul class="nav flex-column server-mode_sidebar">
-              <li class="nav-item server_buttons">
-                  <a class="nav-link active" href="#routes_define">
-                     <i class="fas fa-cogs"></i> Defining Routes
-                  </a>
-              </li>
-            </ul>
-    </nav>
+ <nav class="sidebar">
+    <div class="mode-buttons selector">
+        <button class="client-mode active">Client Mode</button>
+        <button class="server-mode">Server Mode</button>
+    </div>
+    <ul class="nav flex-column client-mode client-mode_sidebar">
+        <li class="nav-item client_buttons active">
+            <a class="nav-link" href="#components">
+                <i class="fas fa-code"></i> Components
+            </a>
+        </li>
+        <li class="nav-item client_buttons">
+            <a class="nav-link" href="#options">
+                <i class="fas fa-cog"></i> Options
+            </a>
+        </li>
+        <li class="nav-item client_buttons">
+            <a class="nav-link" href="#layouts">
+                <i class="fas fa-th"></i> Layouts
+            </a>
+        </li>
+        <li class="nav-item client_buttons">
+            <a class="nav-link" href="#variables">
+                <i class="fas fa-clipboard"></i> Variables
+            </a>
+        </li>
+        <li class="nav-item client_buttons">
+            <a class="nav-link" href="#animations">
+                <i class="fas fa-film"></i> Animations
+            </a>
+        </li>
+    </ul>
+    <ul class="nav flex-column server-mode_sidebar">
+        <li class="nav-item server_buttons">
+            <a class="nav-link active" href="#routes_define">
+                <i class="fas fa-route"></i> Defining Routes
+            </a>
+        </li>
+        <li class="nav-item server_buttons">
+            <a class="nav-link" href="#database">
+                <i class="fas fa-database"></i> Using the Database
+            </a>
+        </li>
+        <li class="nav-item server_buttons">
+            <a class="nav-link" href="#database_connect">
+                <i class="fas fa-plug"></i> Connecting to the Database
+            </a>
+        </li>
+    </ul>
+</nav>
+
 </div>
 
 <div class="example_code client_code" id="client_code">
@@ -228,6 +239,83 @@
         <p>The router.basePath defines the main path of the router file</p>
         <p>The router.get defines the method and the path of the route</p>
     </div>
+    <div class="code_block" id="database">
+        <h4>To use the database use the database module</h4>
+        <p>Example:</p>
+        <pre>
+           const { Table } = require("../modules");
+        const table = new Table();
+         table.name = "users";
+
+table.setSchema({
+    username: {
+        type: "string",
+        required: true,
+    },
+    password: {
+        type: "string",
+        required: true,
+    },
+    email: {
+        type: "string",
+        required: true,
+        unique: true
+    },
+    });
+
+
+module.exports = table;
+        </pre>
+        <p>To define a table go to the /models folder </p>
+        <pre>
+            const usersModel = require("../models/users");
+
+
+usersModel.find({}).then((users) => {
+  console.log(users);
+});
+
+        </pre>
+        <p>To use the table u call the file and all the functionality will come with it  </p>
+    </div>
+    <div class="code_block" id="database_connect">
+        <h4>Using the database outside the engine</h4>
+        <p>To use the database outside the engine we have made a node module to help with that</p>
+        <pre>
+            npm i obsidian-vault
+        </pre>
+        <p>The The Database is always using a port which is specified in the obsidian.config.js</p>
+        <pre>{
+  "name": "An Obsidian App",
+  "view_engine": "html",
+  "port": 3000,
+  "db_port": 27017, // the database port here is 27017
+  "db_name": "obsidian",
+  "db_url": "",
+  "mode": "dev",
+  "no_imports": false,
+  "workers": {
+    "api": {
+      "port": 3001,
+      "path": "/api",
+      "enabled": true,
+      "restricted": false
+    }
+  }
+}
+</pre>
+<p> When using the node module we need to set the url to the url of the server where the engine is hosted </p>
+        <p>Example:</p>
+        <pre>
+            const obsidian = require("obsidian-vault")
+obsidian.init("http://localhost:27017").then(async (result) => {
+    if (result) {
+        console.log("Connected to Obsidian")
+        
+    }
+    })
+        </pre>
+    </div>
 </div>
 
 <script>
@@ -293,7 +381,7 @@ serverModeSidebarButtons.forEach(button => {
 
 
 const options = {
-    threshold: 0.2, // When 20% of the element is visible, trigger the animation
+    threshold: 0.01
 };
 
 const observer = new IntersectionObserver(entries => {
