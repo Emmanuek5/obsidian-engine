@@ -305,6 +305,16 @@ class RenderEngines {
       content = content.replace(pattern, variable);
     }
 
+    if (options.meta && typeof options.meta === "object") {
+      // Generate HTML <meta> tags based on the meta object
+      const metaTags = Object.entries(options.meta).map(([name, content]) => {
+        return `<meta name="${name}" content="${content}">`;
+      });
+
+      // Insert the generated meta tags into the content
+      content = content.replace(/<<\$meta>>/g, metaTags.join("\n"));
+    }
+
     // Check for <<</component>>
     content = content.replace(/<\s*<\s*\/([^>]+)>>/g, (match, tagName) => {
       // Check if the component file exists in the base path using __dirname
