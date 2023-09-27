@@ -129,6 +129,16 @@ app.use("/public", path.join(process.cwd(), "/public"));
 app.use("/scripts", path.join(process.cwd(), "/public/js"));
 app.use("/styles", path.join(process.cwd(), "/public/css"));
 
+app.get("/robots.txt", (req, res) => {
+  const robotsPath = path.join(process.cwd(), "public/robots.txt");
+  if (fs.existsSync(robotsPath)) {
+    res.file(robotsPath);
+  }else{
+    const defaultRobotsPath = path.join(__dirname, "assets/robots.txt");
+    res.file(defaultRobotsPath);
+  }
+});
+
 app.post("/", (req, res) => {
   res.send("Hello World");
 });
