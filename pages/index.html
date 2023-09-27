@@ -1,226 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;1,100;1,300&display=swap" rel="stylesheet">
-
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title><<$name>></title>
-   </head>
-   <style>
-      /* Reset some default styles */
-      body, h1, h2, p {
-         margin: 0;
-         padding: 0;
-         font-family: 'Roboto', sans-serif;
-      }
-
-      /* Set a background color and font for the body */
-      body {
-         font-family: Arial, sans-serif;
-         background-color: #000; /* Change background color to black */
-         color: #fff; /* Change text color to white */
-      }
-
-      /* Style the header */
-      header {
-         background-color: #000; /* Change header background color to black */
-         padding: 20px;
-         text-align: center;
-         display: flex; /* Use flexbox to align items horizontally */
-         align-items: center; /* Center items vertically within the header */
-         justify-content: center; /* Center items horizontally within the header */
-         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-      }
-
-      header img {
-         width: 100px;
-         height: 100px;
-         margin-right: 10px;
-        border-radius: 50%;
-      }
-
-      header h1 {
-         font-size: 36px;
-         color: #00bcd4; /* Change the header text color to cyan */
-      }
-
-      /* Style the top-page section */
-      .top-page {
-         text-align: center;
-         padding: 20px;
-      }
-
-      .top-page h1 {
-         font-size: 36px;
-      }
-
-      .top-page h2 {
-         font-size: 24px;
-      }
-
-      .description p {
-         font-size: 18px;
-      }
-
-      /* Style code sections */
-      .example_code {
-         padding: 20px;
-         background-color: #333; /* Change code section background color to dark blue */
-         border-radius: 5px;
-         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-         margin-top: 20px;
-      }
-
-      /* Style individual code blocks */
-      .code_block {
-         background-color: #222; /* Change code block background color to black */
-         border-radius: 5px;
-         margin: 20px 0;
-         padding: 20px;
-      }
-
-      .code_block h4 {
-         font-size: 24px; /* Increase font size for better readability */
-         color: #00bcd4; /* Change heading color to cyan */
-      }
-
-      pre {
-         font-family: monospace;
-         white-space: pre-wrap;
-         background-color: #333; /* Change code block background color to dark blue */
-         padding: 15px; /* Increase padding for better readability */
-         border-radius: 5px;
-         color: #fff; /* Change code text color to white */
-      }
-
-      a {
-         color: #00bcd4; /* Change link color to cyan */
-         text-decoration: none;
-      }
-
-      a:hover {
-         text-decoration: underline;
-      }
- /* Add styles for the button container */
-   .selector {
-      text-align: center;
-      margin-top: 20px;
-   }
-
-   /* Style the buttons */
-   .selector button {
-      background-color: #00bcd4; /* Button background color */
-      color: #fff; /* Button text color */
-      border: none;
-      padding: 10px 20px;
-      font-size: 18px;
-      cursor: pointer;
-      margin-right: 10px; /* Add some spacing between buttons */
-      border-radius: 5px;
-   }
-
-   .code_block ol {
-      margin-left: 20px;
-   }
-
-
-
-   selector button.active {
-      background-color: #00bcd4; /* Active button background color */
-   }
-
-   /* Style the non-active button */
-   .selector button:not(.active) {
-      background-color: #333; /* Non-active button background color */
-   }
-      /* Make the page responsive */
-      @media screen and (max-width: 768px) {
-         header {
-            flex-direction: column; /* Stack items vertically on smaller screens */
-            align-items: center; /* Center items vertically within the header */
-         }
-
-         header img {
-            margin-bottom: 10px; /* Add spacing between the image and name */
-         }
-      }
-   </style>
-   <body>
-    <div class="base-header">  
-      <header>
-         <div class="header__title">
-            <img src="/assets/logo.png" alt="logo" >
-            <h1><<$title>></h1>
-         </div>
-      </header>
-      <div class="top-page">
-         <div class="top-page__title">
-            <h1>Hello There!</h1>
-         </div>
-         <div class="top-page__subtitle">
-            <h2>Welcome to a new world</h2>
-         </div>
-         <div class="description">
-            <p>This is a new world of simple, fast and Easy to use rendering engines</p>
-            <h>To Change this page go to /pages/index.html</h>
-         </div>
-      </div>
-      <div class="selector">
-         <button class="client_code active" id="client_code">Client</button>
-         <button class="server_code" id="server_code">Server</button>
-    
-      </div>
-   </div>
-      
-      <div class="example_code client_code" id="client_code">
-         <div class="code_block _1" id="components">
-            <h4>To use components in the html file use  &lt;&lt;/component>> </h4>
-            <p>Example</p>
-            <pre>
-                &lt;div class="custom-div"&gt;
-                    &lt;&lt;/component>><br>
-                    &lt;&lt;/component>><br>
-                    &lt;&lt;/component>><br>
-                &lt;/div&gt;
-            </pre>
-            <p>The components are called by file name in the /components folder</p>
-         </div>
-         <div class="code_block _2" id="options">
-            <h4>The options.json is placed in the pages folder or u can place custom ones in a sub path </h4>
-            <p>This is an example /options.json</p>
-            <pre>
-            {
-    "layout": "main",
-    "scripts": [
-        "home.js"
-    ],
-    "styles": [
-        "home.css"
-    ],
-    "render_options": {
-        "title": "Home",
-        "name": "Obsidian Engine"
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;1,100;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Website</title>
+</head>
+<style>
+    /* Reset some default styles */
+    body, h1, h2, p {
+        margin: 0;
+        padding: 0;
+        font-family: 'Roboto', sans-serif;
     }
+
+    /* Set a background color and font for the body */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #000; /* Change background color to black */
+        color: #fff; /* Change text color to white */
+    }
+
+    /* Style the header */
+    header {
+        background-color: #000; /* Change header background color to black */
+        padding: 20px;
+        text-align: center;
+        display: flex; /* Use flexbox to align items horizontally */
+        align-items: center; /* Center items vertically within the header */
+        justify-content: center; /* Center items horizontally within the header */
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    header img {
+        width: 100px;
+        height: 100px;
+        margin-right: 10px;
+        border-radius: 50%;
+    }
+
+    header h1 {
+        font-size: 36px;
+        color: #00bcd4; /* Change the header text color to cyan */
+    }
+
+    /* Style the top-page section */
+    .top-page {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .top-page h1 {
+        font-size: 36px;
+    }
+
+    .top-page h2 {
+        font-size: 24px;
+    }
+
+    .description p {
+        font-size: 18px;
+    }
+
+    /* Style code sections */
+    .example_code {
+        background-color: #333; /* Change code section background color to dark blue */
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        margin-top: 20px;
+          margin-left: 260px; /* Adjust this value as needed */
+    padding: 20px;
+    box-sizing: border-box;
+    }
+
+    /* Style individual code blocks */
+    .code_block {
+        background-color: #222; /* Change code block background color to black */
+        border-radius: 5px;
+        margin: 20px 0;
+        padding: 20px;
+    }
+
+    .code_block h4 {
+        font-size: 24px; /* Increase font size for better readability */
+        color: #00bcd4; /* Change heading color to cyan */
+    }
+
+    pre {
+        font-family: monospace;
+        white-space: pre-wrap;
+        background-color: #333; /* Change code block background color to dark blue */
+        padding: 15px; /* Increase padding for better readability */
+        border-radius: 5px;
+        color: #fff; /* Change code text color to white */
+    }
+
+    a {
+        color: #00bcd4; /* Change link color to cyan */
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    /* Add styles for the button container */
+    .selector {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    /* Style the buttons */
+    .selector button {
+         background-color: #333; /* Button background color */
+        color: #fff; /* Button text color */
+        border: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        cursor: pointer;
+        margin-right: 10px; /* Add some spacing between buttons */
+        border-radius: 5px;
+    }
+
+    .selector button.active {
+        background-color: #00bcd4; /* Active button background color */
+    }
+
+    /* Style the non-active button */
+    .selector button:not(.active) {
+        background-color: #333; /* Non-active button background color */
+    }
+
+/* Style the sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #343a40;
+    color: #fff;
+    padding-top: 20px;
+    z-index: 1; /* Ensure the sidebar is above other content */
 }
+    .sidebar a {
+        color: #fff;
+        text-decoration: none;
+        display: block;
+        padding: 10px;
+    }
+
+    .sidebar a:hover {
+        background-color: #00bcd4;
+    }
+
+    .sidebar .mode-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .sidebar .mode-buttons button {
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin: 5px;
+        cursor: pointer;
+    }
+
+    /* Hide the server code by default */
+.server_code {
+    display: none;
+}
+
+.active {
+    background-color: #00bcd4;
+}
+
+.server-mode_sidebar {
+    display: none;
+}
+
+</style>
+<body>
+<div class="base-header">
+    <header>
+        <div class="header__title">
+            <img src="/assets/logo.png" alt="logo">
+            <h1>Documentation Website</h1>
+        </div>
+    </header>
+    <div class="top-page">
+        <div class="top-page__title">
+            <h1>Hello There!</h1>
+        </div>
+        <div class="top-page__subtitle">
+            <h2>Welcome to a new world</h2>
+        </div>
+        <div class="description">
+            <p>This is a new world of simple, fast and Easy to use rendering engines</p>
+            <p>To Change this page go to /pages/index.html</p>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <nav class="sidebar">
+        <div class="mode-buttons selector ">
+            <button class="client-mode active">Client Mode</button>
+           <button class="server-mode">Server Mode</button>
+        </div>
+        <ul class="nav flex-column client-mode client-mode_sidebar">
+            <li class="nav-item">
+                <a class="nav-link active" href="#components">
+                    <i class="fas fa-cogs"></i> Components
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#options">
+                    <i class="fas fa-cogs"></i> Options
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#layouts">
+                    <i class="fas fa-cogs"></i> Layouts
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#variables">
+                    <i class="fas fa-cogs"></i> Variables
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#animations">
+                    <i class="fas fa-cogs"></i> Animations
+                </a>
+            </li>
+        </ul>
+         <ul class="nav flex-column server-mode_sidebar">
+              <li class="nav-item">
+                  <a class="nav-link active" href="#routes_define">
+                     <i class="fas fa-cogs"></i> Defining Routes
+                  </a>
+              </li>
+            </ul>
+    </nav>
+</div>
+
+<div class="example_code client_code" id="client_code">
+    <div class="code_block _1" id="components">
+        <h4>To use components in the html file use  &lt;&lt;/component&gt;</h4>
+        <p>Example</p>
+        <pre>
+            &lt;div class="custom-div"&gt;
+                &lt;&lt;/component&gt;<br>
+                &lt;&lt;/component&gt;<br>
+                &lt;&lt;/component&gt;<br>
+            &lt;/div&gt;
         </pre>
-            <p>The layout is defined in the /layouts folder</p>
-            <p>render_options is used to define variables that can be used in a html file <a href="#variables">Go There</a></p>
-            <p>The styles are the styles that you want to use in every rendered file using the options.json, They are defined in the public/css </p>
-            <p>The scripts are the scripts that you want to use in every rendered file using the options.json, They are defined in the public/js </p>
-         </div>
-         <div class="code_block _3" id="layouts">
-            <h4>The layouts are found by file name so if we want the main layout we use layouts/main</h4>
-            <p>Example</p>
-            <pre>
+        <p>The components are called by file name in the /components folder</p>
+    </div>
+    <div class="code_block _2" id="options">
+        <h4>The options.json is placed in the pages folder or u can place custom ones in a sub path </h4>
+        <p>This is an example /options.json</p>
+        <pre>
+            {
+                "layout": "main",
+                "scripts": [
+                    "home.js"
+                ],
+                "styles": [
+                    "home.css"
+                ],
+                "render_options": {
+                    "title": "Home",
+                    "name": "Obsidian Engine"
+                }
+            }
+        </pre>
+        <p>The layout is defined in the /layouts folder</p>
+        <p>render_options is used to define variables that can be used in a html file <a href="#variables">Go There</a></p>
+        <p>The styles are the styles that you want to use in every rendered file using the options.json, They are defined in the public/css </p>
+        <p>The scripts are the scripts that you want to use in every rendered file using the options.json, They are defined in the public/js </p>
+    </div>
+    <div class="code_block _3" id="layouts">
+        <h4>The layouts are found by file name so if we want the main layout we use layouts/main</h4>
+        <p>Example</p>
+        <pre>
             &lt;!DOCTYPE html&gt;
             &lt;html lang="en"&gt;
             &lt;head&gt;
                 &lt;meta charset="UTF-8"&gt;
                 &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-                &lt;title>&lt;&lt;title>>&lt;/title&gt;
+                &lt;title>&lt;&lt;title&gt;&lt;/title&gt;
                 &lt;link rel="stylesheet" href="css/style.css"&gt;
                 &lt;script src="js/script.js"&gt;&lt;/script&gt;
             &lt;/head&gt;
@@ -228,143 +305,163 @@
                 &lt;div class="main"&gt;
                     &lt;div class="header"&gt;
                         &lt;div class="header__title"&gt;
-                            &lt;h1>&lt;&lt;title>>&lt;/h1&gt;
+                            &lt;h1>&lt;&lt;title&gt;&lt;/h1&gt;
                         &lt;/div&gt;
                         &lt;div class="header__subtitle"&gt;
-                            &lt;h2>&lt;&lt;subtitle>>&lt;/h2&gt;
+                            &lt;h2>&lt;&lt;subtitle&gt;&lt;/h2&gt;
                         &lt;/div&gt;
                     &lt;/div&gt;
                     &lt;div class="content"&gt;
-                        &lt;&lt;$content>> //This is where the content of the pages that use the layout is rendered
+                        &lt;&lt;$content&gt; //This is where the content of the pages that use the layout is rendered
                     &lt;/div&gt;
                     &lt;div class="footer"&gt;
                         &lt;div class="footer__description"&gt;
-                            &lt;p>&lt;&lt;description>>&lt;/p&gt;
+                            &lt;p>&lt;&lt;description&gt;&lt;/p&gt;
                         &lt;/div&gt;
                     &lt;/div&gt;
                 &lt;/div&gt;
             &lt;/body&gt;
             &lt;/html&gt;
         </pre>
-            <p>
-               The &lt;&lt;$content>> is used to render the content of the pages that use the layout
-            </p>
-         </div>
-         <div class="code_block _4" id="variables">
-            <h4>The variables are defined in the options.json file and can also be defined in the query params so /route?param1=dwd </h4>
-            <p>Example</p>
-            <pre>
-            &lt;&lt;$title>>
+        <p>
+            The &lt;&lt;$content&gt; is used to render the content of the pages that use the layout
+        </p>
+    </div>
+    <div class="code_block _4" id="variables">
+        <h4>The variables are defined in the options.json file and can also be defined in the query params so /route?param1=dwd </h4>
+        <p>Example</p>
+        <pre>
+            &lt;&lt;$title&gt;
         </pre>
-            <p>
-               To use the variables in the html file use &lt;&lt;$variable_name>> 
-            </p>
-            <p>Note: The variables are defined in the options.json file and can also be defined in the query params so /route?param1=dwd </p>
-            <p>And if a variable is not found in the options.json or the query params it will not  be changed</p>
-         </div>
-         <div class="code_block _5" id="components">
-            <h4>To use components in the html file use  &lt;&lt;/component>> </h4>
-            <p>Example component</p>
-            <pre>
+        <p>
+            To use the variables in the html file use &lt;&lt;$variable_name&gt;
+        </p>
+        <p>Note: The variables are defined in the options.json file and can also be defined in the query params so /route?param1=dwd </p>
+        <p>And if a variable is not found in the options.json or the query params it will not  be changed</p>
+    </div>
+    <div class="code_block _5" id="components_file">
+        <h4>To use components in the html file use  &lt;&lt;/component&gt;</h4>
+        <p>Example component</p>
+        <pre>
             &lt;div class="custom-div"&gt;
-              This is a custom div component.
+                This is a custom div component.
             &lt;/div&gt;
         </pre>
-            <p>The components are called by file name in the /components folder</p>
-         </div>
-         <div class="code_block" id="animations">
-            <h4>Animations  Can be used in the JavaScript file </h4>
-            <p>Example:</p>
-            <pre>
-               const element = document.querySelector(".custom-div");
-               fadeIn(element, 1000);
-               fadeOut(element, 1000);
-               slideIn(element, 1000);
-               slideOut(element, 1000);
-         </pre>
-         <p>These are the animations that can be used</p>
-            <ol>
-               <li>fadeIn(element, duration)</li>
-               <li>fadeOut(element, duration)</li>
-               <li>slideIn(element, duration)</li>
-               <li>slideOut(element, duration)</li>
-               <li>slideLeft(element, duration)</li>
-               <li>slideRight(element, duration)</li>
-               <li>slideUp(element, duration)</li>
-               <li>slideDown(element, duration)</li>
-            </ol>
-         </div>
-      </div>
+        <p>The components are called by file name in the /components folder</p>
+    </div>
+    <div class="code_block" id="animations">
+        <h4>Animations  Can be used in the JavaScript file </h4>
+        <p>Example:</p>
+        <pre>
+            const element = document.querySelector(".custom-div");
+            fadeIn(element, 1000);
+            fadeOut(element, 1000);
+            slideIn(element, 1000);
+            slideOut(element, 1000);
+        </pre>
+        <p>These are the animations that can be used</p>
+        <ol>
+            <li>fadeIn(element, duration)</li>
+            <li>fadeOut(element, duration)</li>
+            <li>slideIn(element, duration)</li>
+            <li>slideOut(element, duration)</li>
+            <li>slideLeft(element, duration)</li>
+            <li>slideRight(element, duration)</li>
+            <li>slideUp(element, duration)</li>
+            <li>slideDown(element, duration)</li>
+        </ol>
+    </div>
+</div>
 
-      <div class="example_code server_code" id="server_code">
-        <div class="code_block">
-            <h4>To Add a new route to the /api base route (e.g /api/open etc)</h4>
-            <p>Example</p>
-            <pre>
-               const { Router } = require("../modules");
-               const router = new Router();
-
- 
-             router.basePath = "/";
-
-          router.get("/", (req, res) => {
-           res.send("Hello World!");
-           });
+<div class="example_code server_code hidden" id="server_code">
+    <div class="code_block" id="routes_define">
+        <h4>To Add a new route to the /api base route (e.g /api/open etc)</h4>
+        <p>Example</p>
+        <pre>
+            const { Router } = require("../modules");
+            const router = new Router();
 
 
-         module.exports = router;
-         </pre>
-               <p>To define a route place the file in the /api folder </p>
-               <p>The router.basePath defines the main path of the router file</p>
-               <p>The router.get defines the method and the path of the route</p>
-        </div>
+            router.basePath = "/";
 
-      </div>
+            router.get("/", (req, res) => {
+                res.send("Hello World!");
+            });
+
+
+            module.exports = router;
+        </pre>
+        <p>To define a route place the file in the /api folder </p>
+        <p>The router.basePath defines the main path of the router file</p>
+        <p>The router.get defines the method and the path of the route</p>
+    </div>
+</div>
+
 <script>
-        // JavaScript to toggle code sections based on button click and fade in when visible
 const clientCodeButton = document.getElementById("client_code");
 const codeBlocks = document.querySelectorAll(".code_block");
 const serverCodeButton = document.getElementById("server_code");
 const clientCodeSection = document.querySelector(".example_code.client_code");
 const serverCodeSection = document.querySelector(".example_code.server_code");
+const clientModeButton = document.querySelector(".client-mode");
+const serverModeButton = document.querySelector(".server-mode");
+const sidebar = document.querySelector(".sidebar");
+const serverModeSidebar = document.querySelector(".server-mode_sidebar");
+const clientModeSidebar = document.querySelector(".client-mode_sidebar");
+
 
 const options = {
-   threshold: 0.2, // When 20% of the element is visible, trigger the animation
+    threshold: 0.2, // When 20% of the element is visible, trigger the animation
 };
 
 const observer = new IntersectionObserver(entries => {
-   entries.forEach(entry => {
-      if (entry.isIntersecting) {
-         fadeIn(entry.target, 1000);
-      }
-   });
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            fadeIn(entry.target, 1000);
+        }
+    });
 }, options);
 
 // Add the code sections to the observer
 codeBlocks.forEach(codeBlock => {
-   observer.observe(codeBlock);
+    observer.observe(codeBlock);
 });
 
-clientCodeButton.addEventListener("click", () => {
-   popOut(clientCodeButton, 1000)
-   clientCodeSection.style.display = "block";
-   serverCodeSection.style.display = "none";
-   fadeIn(clientCodeSection, 1000);
-   fadeOut(serverCodeSection, 1000);
-   clientCodeButton.classList.add("active");
-   serverCodeButton.classList.remove("active");
+function toggleSidebarMode() {
+      if (clientModeButton.classList.contains("active")) {
+         serverModeSidebar.style.display = "none";
+         clientModeSidebar.style.display = "block";
+      } else {
+         serverModeSidebar.style.display = "block";
+         clientModeSidebar.style.display = "none";
+      }
+}
+
+clientModeButton.addEventListener("click", () => {
+    popOut(clientCodeButton, 1000);
+    clientCodeSection.style.display = "block";
+    serverCodeSection.style.display = "none";
+    fadeIn(clientCodeSection, 1000);
+    fadeOut(serverCodeSection, 1000);
+    clientModeButton.classList.add("active");
+    serverModeButton.classList.remove("active");
+    toggleSidebarMode();
 });
 
-serverCodeButton.addEventListener("click", () => {
-    popOut(serverCodeButton, 1000)
-   clientCodeSection.style.display = "none";
-   serverCodeSection.style.display = "block";
-   fadeOut(clientCodeSection, 1000);
-   slideIn(serverCodeSection, 1000);
-   fadeIn(serverCodeSection, 1000);
-   clientCodeButton.classList.remove("active");
-   serverCodeButton.classList.add("active");
+serverModeButton.addEventListener("click", () => {
+    popOut(serverModeButton, 1000);
+    clientCodeSection.style.display = "none";
+    serverCodeSection.style.display = "block";
+    fadeOut(clientCodeSection, 1000);
+    slideIn(serverCodeSection, 1000);
+    fadeIn(serverCodeSection, 1000);
+    clientModeButton.classList.remove("active");
+    serverModeButton.classList.add("active");
+    toggleSidebarMode();
 });
-      </script>
-   </body>
+
+// Custom function to add fade-in effect
+
+</script>
+</body>
 </html>
