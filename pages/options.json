@@ -8,6 +8,7 @@
     ],
     "render_options": {
         "title": "Obsidian Engine",
-        "name": "Obsidian Engine"
+        "name": "Obsidian Engine Documentation",
+        "description": "Documentation for the Obsidian Engine"
     }
 }

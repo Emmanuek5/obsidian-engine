@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentation Website</title>
+    <title><<$title>></title>
 </head>
 <style>
     /* Reset some default styles */
@@ -173,6 +173,26 @@
         cursor: pointer;
     }
 
+    .sidebar .nav-item {
+        margin: 5px;
+    }
+
+    .sidebar .nav-item .active {
+        background-color: #00bcd4;
+    }
+
+      .sidebar .nav-item .active:hover {
+     /* increase the size of the active button */
+        padding: 10px;
+
+      }
+
+    .sidebar .nav-item:not(.active) {
+    /* Add your styles here */
+    color: #999; /* Example text color for inactive items */
+    background-color: #333; /* Example background color for inactive items */
+    /* Add any other styles you want for inactive items */
+}
     /* Hide the server code by default */
 .server_code {
     display: none;
@@ -186,13 +206,19 @@
     display: none;
 }
 
+.client-mode_sidebar {
+    display: block;
+}
+
+
 </style>
 <body>
 <div class="base-header">
     <header>
         <div class="header__title">
             <img src="/assets/logo.png" alt="logo">
-            <h1>Documentation Website</h1>
+            <h1><<$name>></h1>
+            
         </div>
     </header>
     <div class="top-page">
@@ -216,34 +242,34 @@
            <button class="server-mode">Server Mode</button>
         </div>
         <ul class="nav flex-column client-mode client-mode_sidebar">
-            <li class="nav-item">
-                <a class="nav-link active" href="#components">
+            <li class="nav-item client_buttons active">
+                <a class="nav-link" href="#components">
                     <i class="fas fa-cogs"></i> Components
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item client_buttons">
                 <a class="nav-link" href="#options">
                     <i class="fas fa-cogs"></i> Options
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item client_buttons">
                 <a class="nav-link" href="#layouts">
                     <i class="fas fa-cogs"></i> Layouts
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item client_buttons">
                 <a class="nav-link" href="#variables">
                     <i class="fas fa-cogs"></i> Variables
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item client_buttons">
                 <a class="nav-link" href="#animations">
                     <i class="fas fa-cogs"></i> Animations
                 </a>
             </li>
         </ul>
          <ul class="nav flex-column server-mode_sidebar">
-              <li class="nav-item">
+              <li class="nav-item server_buttons">
                   <a class="nav-link active" href="#routes_define">
                      <i class="fas fa-cogs"></i> Defining Routes
                   </a>
@@ -408,6 +434,36 @@ const serverModeButton = document.querySelector(".server-mode");
 const sidebar = document.querySelector(".sidebar");
 const serverModeSidebar = document.querySelector(".server-mode_sidebar");
 const clientModeSidebar = document.querySelector(".client-mode_sidebar");
+const clientModeSidebarButtons = document.querySelectorAll(".client_buttons")
+const  serverModeSidebarButtons = document.querySelectorAll(".server_buttons")
+
+console.log(clientModeSidebarButtons)
+function setActive(clickedButton, buttons) {
+    buttons.forEach(button => {
+        if (button === clickedButton) {
+            button.classList.add("active");
+        } else {
+            button.classList.remove("active");
+        }
+    });
+}
+
+
+// Add click event listeners to client mode buttons
+clientModeSidebarButtons.forEach(button => {
+   console.log(button)
+  button.addEventListener("click", () => {
+        setActive(button, clientModeSidebarButtons);
+    });
+});
+
+// Add click event listeners to server mode buttons
+serverModeSidebarButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        setActive(button, serverModeSidebarButtons);
+    });
+});
+
 
 
 const options = {
