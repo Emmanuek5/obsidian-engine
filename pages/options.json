@@ -1,13 +1,13 @@
 {
-    "layout": "main",
-    "scripts": [
-        "home.js"
-    ],
-    "styles": [
-        "home.css"
-    ],
-    "render_options": {
-        "title": "Obsidian Engine",
-        "name": "Obsidian Engine"
-    }
+  "layout": "main",
+  "scripts": ["home.js"],
+  "styles": ["home.css"],
+  "render_options": {
+    "title": "Home",
+    "name": "Obsidian Engine"
+  },
+  "meta": {
+    "title": "Obsidian Engine",
+    "description": "This is the demo site of the obsidian engine"
+  }
 }
