@@ -316,32 +316,50 @@
 
       </div>
 <script>
-         // JavaScript to toggle code sections based on button click
-         const clientCodeButton = document.getElementById("client_code");
-         const serverCodeButton = document.getElementById("server_code");
-         const clientCodeSection = document.querySelector(".example_code.client_code");
-         const serverCodeSection = document.querySelector(".example_code.server_code");
+        // JavaScript to toggle code sections based on button click and fade in when visible
+const clientCodeButton = document.getElementById("client_code");
+const codeBlocks = document.querySelectorAll(".code_block");
+const serverCodeButton = document.getElementById("server_code");
+const clientCodeSection = document.querySelector(".example_code.client_code");
+const serverCodeSection = document.querySelector(".example_code.server_code");
 
-         clientCodeButton.addEventListener("click", () => {
-            pulse(clientCodeButton, 1000)
-            clientCodeSection.style.display = "block";
-            serverCodeSection.style.display = "none";
-            fadeIn(clientCodeSection, 1000);
-            fadeOut(serverCodeSection, 1000);
-            clientCodeButton.classList.add("active");
-            serverCodeButton.classList.remove("active");
-         });
+const options = {
+   threshold: 0.2, // When 20% of the element is visible, trigger the animation
+};
 
-         serverCodeButton.addEventListener("click", () => {
-            pulse(serverCodeButton, 1000)
-            clientCodeSection.style.display = "none";
-            serverCodeSection.style.display = "block";
-            fadeOut(clientCodeSection, 1000);
-            slideIn(serverCodeSection, 1000);
-            fadeIn(serverCodeSection, 1000);
-            clientCodeButton.classList.remove("active");
-            serverCodeButton.classList.add("active");
-         });
+const observer = new IntersectionObserver(entries => {
+   entries.forEach(entry => {
+      if (entry.isIntersecting) {
+         fadeIn(entry.target, 1000);
+      }
+   });
+}, options);
+
+// Add the code sections to the observer
+codeBlocks.forEach(codeBlock => {
+   observer.observe(codeBlock);
+});
+
+clientCodeButton.addEventListener("click", () => {
+   popOut(clientCodeButton, 1000)
+   clientCodeSection.style.display = "block";
+   serverCodeSection.style.display = "none";
+   fadeIn(clientCodeSection, 1000);
+   fadeOut(serverCodeSection, 1000);
+   clientCodeButton.classList.add("active");
+   serverCodeButton.classList.remove("active");
+});
+
+serverCodeButton.addEventListener("click", () => {
+    popOut(serverCodeButton, 1000)
+   clientCodeSection.style.display = "none";
+   serverCodeSection.style.display = "block";
+   fadeOut(clientCodeSection, 1000);
+   slideIn(serverCodeSection, 1000);
+   fadeIn(serverCodeSection, 1000);
+   clientCodeButton.classList.remove("active");
+   serverCodeButton.classList.add("active");
+});
       </script>
    </body>
 </html>

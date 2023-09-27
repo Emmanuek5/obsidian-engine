@@ -210,6 +210,38 @@ class RenderEngines {
         );
       `,
       },
+      popOut : {
+        parameters: ["element", "duration"],
+        code: `
+        element.animate(
+          [
+            { opacity: 0 },
+            { opacity: 1 }
+          ],
+          { 
+            duration: duration,
+            iterations: 1, // Play the animation just once
+            fill: "forwards" // Keep the end state (opacity 1)
+          }
+        );
+      `,
+      },
+      popIn : {
+        parameters: ["element", "duration"],
+        code: `
+        element.animate(
+          [
+            { opacity: 1 },
+            { opacity: 0 }
+          ],
+          { 
+            duration: duration,
+            iterations: 1, // Play the animation just once
+            fill: "forwards" // Keep the end state (opacity 0)
+          }
+        );
+      `,
+      },
       
    };
 
