@@ -10,8 +10,22 @@ const pagesPath = path.join(defaultPath, "pages");
 const routesPath = path.join(defaultPath, "api");
 const tablesPath = path.join(defaultPath, "models");
 const {spawn} = require("child_process");
-
-const database = new Database("database");
+let portdb = null;
+let url = null;
+let remote = false;
+if (config.get("db_port") !== undefined && config.get("db_port") !== "" && config.get("db_port") !== null) {
+      portdb = config.get("db_port");
+}else{
+   portdb = 6379;
+}
+if (!config.get("db_url") === undefined && config.get("db_url") !== "") {
+      url = config.get("db_url");
+      remote = true;
+}else{
+   url = "database";
+}
+  
+const database = new Database(url, portdb, remote);
 process.env.VIEWS_PATH = path.join(defaultPath, "views");
 process.env.VIEW_ENGINE = config.get("view_engine");
 
@@ -122,10 +136,10 @@ app.post("/", (req, res) => {
 app.listen(port, (port) => {
   if (port === 80) {
     console.log(`Server listening on http://localhost/`);
-    openUrlInBrowser("http://localhost/");
+    //openUrlInBrowser("http://localhost/");
   }else{
     console.log(`Server listening on http://localhost:${port}`);
-    openUrlInBrowser(`http://localhost:${port}`);
+    //openUrlInBrowser(`http://localhost:${port}`);
   }
 });
 
