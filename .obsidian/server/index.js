@@ -9,6 +9,7 @@ const defaultPath = process.cwd();
 const pagesPath = path.join(defaultPath, "pages");
 const routesPath = path.join(defaultPath, "api");
 const tablesPath = path.join(defaultPath, "models");
+const {spawn} = require("child_process");
 
 const database = new Database("database");
 process.env.VIEWS_PATH = path.join(defaultPath, "views");
@@ -121,7 +122,19 @@ app.post("/", (req, res) => {
 app.listen(port, (port) => {
   if (port === 80) {
     console.log(`Server listening on http://localhost/`);
+    openUrlInBrowser("http://localhost/");
   }else{
     console.log(`Server listening on http://localhost:${port}`);
+    openUrlInBrowser(`http://localhost:${port}`);
   }
 });
+
+function openUrlInBrowser(url) {
+  if (process.platform === "win32") {
+    spawn("rundll32", ["url.dll,FileProtocolHandler", url], { shell: true });
+  } else if (process.platform === "darwin") {
+    spawn("open", [url]);
+  } else {
+    spawn("xdg-open", [url]);
+  }
+}
