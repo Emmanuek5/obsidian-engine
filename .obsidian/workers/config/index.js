@@ -19,7 +19,12 @@ class Config {
    * - ...
    */
   get(key) {
-    return this.config[key];
+    const findKey = this.config[key];
+    if (findKey) {
+      return findKey;
+    } else {
+      return undefined;
+    }
   }
 
   getConfigFile() {
