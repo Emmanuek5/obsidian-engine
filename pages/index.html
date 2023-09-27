@@ -210,6 +210,12 @@
     display: block;
 }
 
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    
+}
 
 </style>
 <body>
@@ -424,6 +430,9 @@
 </div>
 
 <script>
+
+
+
 const clientCodeButton = document.getElementById("client_code");
 const codeBlocks = document.querySelectorAll(".code_block");
 const serverCodeButton = document.getElementById("server_code");
@@ -436,6 +445,22 @@ const serverModeSidebar = document.querySelector(".server-mode_sidebar");
 const clientModeSidebar = document.querySelector(".client-mode_sidebar");
 const clientModeSidebarButtons = document.querySelectorAll(".client_buttons")
 const  serverModeSidebarButtons = document.querySelectorAll(".server_buttons")
+
+function toggleSidebar() {
+    if (window.innerWidth <= 768) {
+        // Hide the sidebar on smaller screens
+        sidebar.style.display = "none";
+    } else {
+        // Show the sidebar on larger screens
+        sidebar.style.display = "block";
+    }
+}
+
+// Call the function initially
+toggleSidebar();
+
+// Listen for window resize events and adjust the sidebar accordingly
+window.addEventListener("resize", toggleSidebar);
 
 console.log(clientModeSidebarButtons)
 function setActive(clickedButton, buttons) {
