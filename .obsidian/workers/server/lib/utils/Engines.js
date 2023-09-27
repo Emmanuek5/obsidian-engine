@@ -275,6 +275,7 @@ class RenderEngines {
   htmlRenderer(file, options) {
     // Read the content of the view file
     let content = "";
+    let meta = {}
 
     const filePath = path.join(this.pagesPath, file + ".html");
     const fileDir = path.dirname(filePath);
@@ -288,10 +289,14 @@ class RenderEngines {
       const optionsFile = fs.readFileSync(optionsFilePath, "utf8");
       const optionsJson = JSON.parse(optionsFile);
       options = Object.assign(options, optionsJson.render_options);
+      meta = Object.assign(meta, optionsJson.meta);
+      options.meta = meta
     } else if (fs.existsSync(defaultOptionsFilePath)) {
       const optionsFile = fs.readFileSync(defaultOptionsFilePath, "utf8");
       const optionsJson = JSON.parse(optionsFile);
+      meta = Object.assign(meta, optionsJson.meta);
       options = Object.assign(options, optionsJson.render_options);
+     options.meta = meta;
     }
     content = fs.readFileSync(filePath, "utf8");
     // Exclude the options.config property
@@ -305,15 +310,23 @@ class RenderEngines {
       content = content.replace(pattern, variable);
     }
 
-    if (options.meta && typeof options.meta === "object") {
-      // Generate HTML <meta> tags based on the meta object
-      const metaTags = Object.entries(options.meta).map(([name, content]) => {
-        return `<meta name="${name}" content="${content}">`;
-      });
+if (options.meta && typeof options.meta === "object") {
+  const customMetaTags = [];
 
-      // Insert the generated meta tags into the content
-      content = content.replace(/<<\$meta>>/g, metaTags.join("\n"));
-    }
+  // Loop through the properties in the meta object
+  for (const key in options.meta) {
+    const value = options.meta[key];
+    // Generate an HTML <meta> tag for each property
+    customMetaTags.push(`<meta name="${key}" content="${value}">`);
+  }
+
+  // Insert the generated custom meta tags into the head of the content
+  content = content.replace(
+    /<\/head>/i,
+    `${customMetaTags.join("\n")}\n</head>`
+  );
+}
+
 
     // Check for <<</component>>
     content = content.replace(/<\s*<\s*\/([^>]+)>>/g, (match, tagName) => {
