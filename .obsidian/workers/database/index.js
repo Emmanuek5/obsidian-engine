@@ -50,6 +50,12 @@ class Database {
     this.app.delete("/table/:tableName/deleteAll", (req, res) =>
       this.deleteAllRoute(req, res)
     );
+    this.app.put("/table/:tableName/findOneAndUpdate", (req, res) =>
+      this.updateOneRowRoute(req, res)
+    );
+    this.app.delete("/table/:tableName/findAndDeleteOne", (req, res) => {
+      this.deleteOneRowRoute(req, res);
+    });
 
     this.app.post("/receiveData", (req, res) =>
       this.receiveDataRoute(req, res)
@@ -197,6 +203,30 @@ class Database {
     }
   }
 
+  updateOneRowRoute(req, res) {
+    const { tableName } = req.params;
+    const table = this.getTable(tableName);
+    if (!table) {
+      return res.status(404).json({ error: `Table '${tableName}' not found.` });
+    }
+     
+    const { query, update } = req.body;
+  if (!query || !update) {
+      return res
+        .status(400)
+        .json({ error: "Both query and update data are required." });
+    }
+
+    
+    if (table.findOneAndUpdate(query, update)) {
+      return res.json({ message: "Row updated successfully." });
+    } else {
+      return res.status(404).json({ error: "Row not found for update." });
+    }
+
+  }
+      
+
   deleteRowRoute(req, res) {
     const { tableName } = req.params;
     const table = this.getTable(tableName);
@@ -216,6 +246,24 @@ class Database {
     }
   }
 
+  deleteOneRowRoute(req, res) {
+    const { tableName } = req.params;
+    const table = this.getTable(tableName);
+    if (!table) {
+      return res.status(404).json({ error: `Table '${tableName}' not found.` });
+    }
+    const { query } = req.body;
+    if (!query) { 
+      return res.status(400).json({ error: "Query data is required." });
+    }
+
+    if (table.findAndDeleteOne(query)) {
+      return res.json({ message: "Row deleted successfully." });
+    } else {
+      return res.status(404).json({ error: "Row not found for deletion." });
+    }
+  }
+  
   deleteAllRoute(req, res) {
     const { tableName } = req.params;
     const table = this.getTable(tableName);
@@ -584,6 +632,15 @@ class Table extends EventEmitter {
     }
     return results;
   }
+
+  findOne(query) {
+    const results = this.find(query);
+    if (results.length > 0) {
+      return results[0];
+    } else {
+      return null;
+    }
+  }
   
 
   /**
@@ -594,6 +651,28 @@ class Table extends EventEmitter {
    * @return {boolean} Returns true if a row was found and updated, false otherwise.
    */
   findAndUpdate(query, update) {
+    const results = this.find(query);
+    if (results.length > 0) {
+      for (const row of results) {
+        for (const key in update) {
+          row[key] = update[key];
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+    // Emit the 'save' event after updating a row
+  }
+
+  /**
+   * Updates a row in the database based on the given query and update object.
+   *
+   * @param {object} query - The query object used to find the row to update.
+   * @param {object} update - The object containing the updated values for the row.
+   * @return {boolean} Returns true if a row was found and updated, false otherwise.
+   */
+  findOneAndUpdate(query, update) {
     const results = this.find(query);
     if (results.length > 0) {
       const updatedRow = results[0];
@@ -617,15 +696,36 @@ class Table extends EventEmitter {
   findAndDelete(query) {
     const results = this.find(query);
     if (results.length > 0) {
-      const index = this.data.indexOf(results[0]);
-      this.data.splice(index, 1);
-      this.emit("save");
+      for (const row of results) {
+        this.data.splice(this.data.indexOf(row), 1);
+      }
       return true;
     } else {
       return false;
     }
     // Emit the 'save' event after deleting a row
   }
+
+  findAndDeleteOne(query) {
+    const results = this.find(query);
+    if (results.length > 0) {
+      const row = results[0];
+      this.data.splice(this.data.indexOf(row), 1);
+      return true;
+    } else {
+      return false;
+    }
+    // Emit the 'save' event after deleting a row
+  }
+
+
+
+  /**
+   * Delete all the elements in the data array that match the given query.
+   *
+   * @param {type} query - the query to match against the elements in the data array
+   * @return {boolean} true if an element is deleted, otherwise false
+   */
   deleteAll() {
     this.data = [];
     this.emit("save");
