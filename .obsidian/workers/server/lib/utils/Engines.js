@@ -374,6 +374,24 @@ class RenderEngines {
    layoutContent = layoutContent.replace(pattern, variable);
  }
 
+  if (options.meta && typeof options.meta === "object") {
+    const customMetaTags = [];
+
+    // Loop through the properties in the meta object
+    for (const key in options.meta) {
+      const value = options.meta[key];
+      // Generate an HTML <meta> tag for each property
+      customMetaTags.push(`<meta name="${key}" content="${value}">`);
+    }
+
+    // Insert the generated custom meta tags into the head of the content
+    layoutContent = layoutContent.replace(
+      /<\/head>/i,
+      `${customMetaTags.join("\n")}\n</head>`
+    );
+  }
+
+
  layoutContent = layoutContent.replace(/<\s*<\s*\/([^>]+)>>/g, (match, tagName) => {
    // Check if the component file exists in the base path using __dirname
    const componentFilePath = path.join(this.componentPath, tagName + ".html");
@@ -436,6 +454,24 @@ class RenderEngines {
          const pattern = new RegExp(`<<\\$${key}>>`, "g");
          layoutContent = layoutContent.replace(pattern, variable);
        }
+
+        if (options.meta && typeof options.meta === "object") {
+          const customMetaTags = [];
+
+          // Loop through the properties in the meta object
+          for (const key in options.meta) {
+            const value = options.meta[key];
+            // Generate an HTML <meta> tag for each property
+            customMetaTags.push(`<meta name="${key}" content="${value}">`);
+          }
+
+          // Insert the generated custom meta tags into the head of the content
+          layoutContent = layoutContent.replace(
+            /<\/head>/i,
+            `${customMetaTags.join("\n")}\n</head>`
+          );
+        }
+
 
        layoutContent = layoutContent.replace(/<\s*<\s*\/([^>]+)>>/g, (match, tagName) => {
          // Check if the component file exists in the base path using __dirname
