@@ -1,0 +1,100 @@
+<div class="example_code server_code hidden" id="server_code">
+    <div class="code_block" id="routes_define">
+        <h4>To Add a new route to the /api base route (e.g /api/open etc)</h4>
+        <p>Example</p>
+        <pre>
+            const { Router } = require("../modules");
+            const router = new Router();
+
+
+            router.basePath = "/";
+
+            router.get("/", (req, res) => {
+                res.send("Hello World!");
+            });
+
+
+            module.exports = router;
+        </pre>
+        <p>To define a route place the file in the /api folder </p>
+        <p>The router.basePath defines the main path of the router file</p>
+        <p>The router.get defines the method and the path of the route</p>
+    </div>
+    <div class="code_block" id="database">
+        <h4>To use the database use the database module</h4>
+        <p>Example:</p>
+        <pre>
+           const { Table } = require("../modules");
+        const table = new Table();
+         table.name = "users";
+
+table.setSchema({
+    username: {
+        type: "string",
+        required: true,
+    },
+    password: {
+        type: "string",
+        required: true,
+    },
+    email: {
+        type: "string",
+        required: true,
+        unique: true
+    },
+    });
+
+
+module.exports = table;
+        </pre>
+        <p>To define a table go to the /models folder </p>
+        <pre>
+            const usersModel = require("../models/users");
+
+
+usersModel.find({}).then((users) => {
+  console.log(users);
+});
+
+        </pre>
+        <p>To use the table u call the file and all the functionality will come with it  </p>
+    </div>
+    <div class="code_block" id="database_connect">
+        <h4>Using the database outside the engine</h4>
+        <p>To use the database outside the engine we have made a node module to help with that</p>
+        <pre>
+            npm i obsidian-vault
+        </pre>
+        <p>The The Database is always using a port which is specified in the obsidian.config.js</p>
+        <pre>{
+  "name": "An Obsidian App",
+  "view_engine": "html",
+  "port": 3000,
+  "db_port": 27017, // the database port here is 27017
+  "db_name": "obsidian",
+  "db_url": "",
+  "mode": "dev",
+  "no_imports": false,
+  "workers": {
+    "api": {
+      "port": 3001,
+      "path": "/api",
+      "enabled": true,
+      "restricted": false
+    }
+  }
+}
+</pre>
+<p> When using the node module we need to set the url to the url of the server where the engine is hosted </p>
+        <p>Example:</p>
+        <pre>
+            const obsidian = require("obsidian-vault")
+obsidian.init("http://localhost:27017").then(async (result) => {
+    if (result) {
+        console.log("Connected to Obsidian")
+        
+    }
+    })
+        </pre>
+    </div>
+</div>

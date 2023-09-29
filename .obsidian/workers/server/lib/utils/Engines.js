@@ -11,11 +11,11 @@ class RenderEngines {
         renderer: this.htmlRenderer.bind(this),
       },
     ];
-   this.functions = {
-     // Define your functions here
-     animate: {
-       parameters: ["element", "duration"],
-       code: `
+    this.functions = {
+      // Define your functions here
+      animate: {
+        parameters: ["element", "duration"],
+        code: `
       element.animate(
         [
           { transform: 'translateY(0px)' }, 
@@ -27,10 +27,10 @@ class RenderEngines {
         }
       );
     `,
-     },
-     fadeIn: {
-       parameters: ["element", "duration"],
-       code: `
+      },
+      fadeIn: {
+        parameters: ["element", "duration"],
+        code: `
       element.style.opacity = 0;
       element.animate(
         [
@@ -44,10 +44,10 @@ class RenderEngines {
         }
       );
     `,
-     },
-     fadeOut: {
-       parameters: ["element", "duration"],
-       code: `
+      },
+      fadeOut: {
+        parameters: ["element", "duration"],
+        code: `
       element.style.opacity = 1;
       element.animate(
         [
@@ -61,10 +61,10 @@ class RenderEngines {
         }
       );
     `,
-     },
-     rotate: {
-       parameters: ["element", "duration"],
-       code: `
+      },
+      rotate: {
+        parameters: ["element", "duration"],
+        code: `
       element.animate(
         [
           { transform: 'rotate(0deg)' },
@@ -76,7 +76,7 @@ class RenderEngines {
         }
       );
     `,
-     },
+      },
       scale: {
         parameters: ["element", "duration"],
         code: `
@@ -160,7 +160,7 @@ class RenderEngines {
         );
       `,
       },
-      slideIn : {
+      slideIn: {
         parameters: ["element", "duration"],
         code: `
         element.style.transform = "translateX(-100%)";
@@ -177,7 +177,7 @@ class RenderEngines {
         );
       `,
       },
-      slideOut : {
+      slideOut: {
         parameters: ["element", "duration"],
         code: `
         element.style.transform = "translateX(0%)";
@@ -194,7 +194,7 @@ class RenderEngines {
         );
       `,
       },
-      pulse : {
+      pulse: {
         parameters: ["element", "duration"],
         code: `
         element.animate(
@@ -210,7 +210,7 @@ class RenderEngines {
         );
       `,
       },
-      popOut : {
+      popOut: {
         parameters: ["element", "duration"],
         code: `
         element.animate(
@@ -226,7 +226,7 @@ class RenderEngines {
         );
       `,
       },
-      popIn : {
+      popIn: {
         parameters: ["element", "duration"],
         code: `
         element.animate(
@@ -242,10 +242,7 @@ class RenderEngines {
         );
       `,
       },
-      
-   };
-
-
+    };
 
     this.defaultRenderer = defaultRenderer;
     this.componentPath = path.join(process.cwd(), "/components"); // Relative path to the components folder
@@ -275,7 +272,7 @@ class RenderEngines {
   htmlRenderer(file, options) {
     // Read the content of the view file
     let content = "";
-    let meta = {}
+    let meta = {};
 
     const filePath = path.join(this.pagesPath, file + ".html");
     const fileDir = path.dirname(filePath);
@@ -290,43 +287,41 @@ class RenderEngines {
       const optionsJson = JSON.parse(optionsFile);
       options = Object.assign(options, optionsJson.render_options);
       meta = Object.assign(meta, optionsJson.meta);
-      options.meta = meta
+      options.meta = meta;
     } else if (fs.existsSync(defaultOptionsFilePath)) {
       const optionsFile = fs.readFileSync(defaultOptionsFilePath, "utf8");
       const optionsJson = JSON.parse(optionsFile);
       meta = Object.assign(meta, optionsJson.meta);
       options = Object.assign(options, optionsJson.render_options);
-     options.meta = meta;
+      options.meta = meta;
     }
     content = fs.readFileSync(filePath, "utf8");
     // Exclude the options.config property
     if (options.config) {
       delete options.config;
     }
-
     for (const key in options) {
       const variable = options[key];
       const pattern = new RegExp(`<<\\$${key}>>`, "g");
       content = content.replace(pattern, variable);
     }
 
-if (options.meta && typeof options.meta === "object") {
-  const customMetaTags = [];
+    if (options.meta && typeof options.meta === "object") {
+      const customMetaTags = [];
 
-  // Loop through the properties in the meta object
-  for (const key in options.meta) {
-    const value = options.meta[key];
-    // Generate an HTML <meta> tag for each property
-    customMetaTags.push(`<meta name="${key}" content="${value}">`);
-  }
+      // Loop through the properties in the meta object
+      for (const key in options.meta) {
+        const value = options.meta[key];
+        // Generate an HTML <meta> tag for each property
+        customMetaTags.push(`<meta name="${key}" content="${value}">`);
+      }
 
-  // Insert the generated custom meta tags into the head of the content
-  content = content.replace(
-    /<\/head>/i,
-    `${customMetaTags.join("\n")}\n</head>`
-  );
-}
-
+      // Insert the generated custom meta tags into the head of the content
+      content = content.replace(
+        /<\/head>/i,
+        `${customMetaTags.join("\n")}\n</head>`
+      );
+    }
 
     // Check for <<</component>>
     content = content.replace(/<\s*<\s*\/([^>]+)>>/g, (match, tagName) => {
@@ -350,14 +345,13 @@ if (options.meta && typeof options.meta === "object") {
       content = this.addFaviconToContent(content);
     }
 
-   //check  for the <script> tag and get the content of the tag
-   const scriptRegex = /<script>([\s\S]*?)<\/script>/g;
-   const scriptMatches = content.matchAll(scriptRegex);
-   for (const match of scriptMatches) {
-     const scriptContent = match[1];
-     content = content.replace(match[0], this.renderJavascript(scriptContent));
-   }
-
+    //check  for the <script> tag and get the content of the tag
+    const scriptRegex = /<script>([\s\S]*?)<\/script>/g;
+    const scriptMatches = content.matchAll(scriptRegex);
+    for (const match of scriptMatches) {
+      const scriptContent = match[1];
+      content = content.replace(match[0], this.renderJavascript(scriptContent));
+    }
 
     // Let's check the directory where the file is located and get the options.json,
     // then get all the keys from the JSON, and get the layout to render it with the options.
@@ -373,13 +367,34 @@ if (options.meta && typeof options.meta === "object") {
       let layoutContent = fs.readFileSync(layoutFile, "utf8");
       // Replace <<$content>> in the layout with the actual content
       layoutContent = layoutContent.replace(/<<\$content>>/g, content);
+ for (const key in options.render_options) {
 
+   const variable = options[key];
+   const pattern = new RegExp(`<<\\$${key}>>`, "g");
+   layoutContent = layoutContent.replace(pattern, variable);
+ }
+
+ layoutContent = layoutContent.replace(/<\s*<\s*\/([^>]+)>>/g, (match, tagName) => {
+   // Check if the component file exists in the base path using __dirname
+   const componentFilePath = path.join(this.componentPath, tagName + ".html");
+   try {
+     // Read and insert the component content if it exists
+     const componentContent = fs.readFileSync(componentFilePath, "utf8");
+     return componentContent;
+   } catch (error) {
+     // If the component file doesn't exist, return an empty string
+     console.log(error);
+     return "";
+   }
+ });
       // Include any JavaScript files directly in the HTML content
       if (options.scripts.length > 0) {
         for (const script of options.scripts) {
           const scriptPath = path.join(this.scriptsDir, script);
           try {
-            layoutContent += this.renderJavascript(fs.readFileSync(scriptPath, "utf8"));
+            layoutContent += this.renderJavascript(
+              fs.readFileSync(scriptPath, "utf8")
+            );
           } catch (error) {
             console.error(
               `Error reading script file ${scriptPath}: ${error.message}`
@@ -416,6 +431,28 @@ if (options.meta && typeof options.meta === "object") {
       const layoutContent = fs.readFileSync(layoutFile, "utf8");
       // Replace <<$content>> in the layout with the actual content
       layoutContent = layoutContent.replace(/<<\$content>>/g, content);
+       for (const key in options.render_options) {
+         const variable = options[key];
+         const pattern = new RegExp(`<<\\$${key}>>`, "g");
+         layoutContent = layoutContent.replace(pattern, variable);
+       }
+
+       layoutContent = layoutContent.replace(/<\s*<\s*\/([^>]+)>>/g, (match, tagName) => {
+         // Check if the component file exists in the base path using __dirname
+         const componentFilePath = path.join(
+           this.componentPath,
+           tagName + ".html"
+         );
+         try {
+           // Read and insert the component content if it exists
+           const componentContent = fs.readFileSync(componentFilePath, "utf8");
+           return componentContent;
+         } catch (error) {
+           // If the component file doesn't exist, return an empty string
+           console.log(error);
+           return "";
+         }
+       });
 
       // Include any JavaScript files directly in the HTML content
       if (options.scripts.length > 0) {
@@ -423,7 +460,9 @@ if (options.meta && typeof options.meta === "object") {
           const scriptPath = path.join(this.scriptsDir, script);
           console.log(scriptPath);
           try {
-            layoutContent += this.renderJavascript(fs.readFileSync(scriptPath, "utf8"));
+            layoutContent += this.renderJavascript(
+              fs.readFileSync(scriptPath, "utf8")
+            );
           } catch (error) {
             console.error(
               `Error reading script file ${scriptPath}: ${error.message}`
@@ -471,7 +510,7 @@ if (options.meta && typeof options.meta === "object") {
 
   renderJavascript(scriptContents) {
     try {
-      const scriptContent = scriptContents
+      const scriptContent = scriptContents;
       let modifiedScript = scriptContent;
       // Updated regex to match function calls like lol()
       const functionRegex = /(\w+)\s*\(([^)]*)\);?/g;
