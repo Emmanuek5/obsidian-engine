@@ -406,35 +406,42 @@ class RenderEngines {
    }
  });
       // Include any JavaScript files directly in the HTML content
-      if (options.scripts.length > 0) {
-        for (const script of options.scripts) {
-          const scriptPath = path.join(this.scriptsDir, script);
-          try {
-            layoutContent += this.renderJavascript(
-              fs.readFileSync(scriptPath, "utf8")
-            );
-          } catch (error) {
-            console.error(
-              `Error reading script file ${scriptPath}: ${error.message}`
-            );
-          }
-        }
-      }
+       if (options.scripts.length > 0) {
+         for (const script of options.scripts) {
+           const scriptPath = path.join(this.scriptsDir, script);
+           console.log(scriptPath);
+           try {
+             layoutContent = layoutContent.replace(
+               /<\/body>/i,
+               `${this.renderJavascript(
+                 fs.readFileSync(scriptPath, "utf8")
+               )}\n</body>`
+             );
+           } catch (error) {
+             console.error(
+               `Error reading script file ${scriptPath}: ${error.message}`
+             );
+           }
+         }
+       }
 
-      // Include any stylesheets directly in the HTML content
-      if (options.styles.length > 0) {
-        for (const style of options.styles) {
-          const stylePath = path.join(this.stylesDir, style);
-          try {
-            const styleContent = fs.readFileSync(stylePath, "utf8");
-            layoutContent += `<style>${styleContent}</style>`;
-          } catch (error) {
-            console.error(
-              `Error reading style file ${stylePath}: ${error.message}`
-            );
-          }
-        }
-      }
+       // Include any stylesheets directly in the HTML content
+       if (options.styles.length > 0) {
+         for (const style of options.styles) {
+           const stylePath = path.join(this.stylesDir, style);
+           try {
+             const styleContent = fs.readFileSync(stylePath, "utf8");
+             layoutContent = layoutContent.replace(
+               /<\/body>/i,
+               `<style>${styleContent}</style></body>`
+             );
+           } catch (error) {
+             console.error(
+               `Error reading style file ${stylePath}: ${error.message}`
+             );
+           }
+         }
+       }
 
       // Return the layout content with included scripts and styles
       return layoutContent;
@@ -496,8 +503,11 @@ class RenderEngines {
           const scriptPath = path.join(this.scriptsDir, script);
           console.log(scriptPath);
           try {
-            layoutContent += this.renderJavascript(
-              fs.readFileSync(scriptPath, "utf8")
+            layoutContent = layoutContent.replace(
+              /<\/body>/i,
+              `${this.renderJavascript(
+                fs.readFileSync(scriptPath, "utf8")
+              )}\n</body>`
             );
           } catch (error) {
             console.error(
@@ -513,7 +523,10 @@ class RenderEngines {
           const stylePath = path.join(this.stylesDir, style);
           try {
             const styleContent = fs.readFileSync(stylePath, "utf8");
-            layoutContent += `<style>${styleContent}</style>`;
+            layoutContent = layoutContent.replace(
+              /<\/body>/i,
+              `<style>${styleContent}</style></body>`
+            );
           } catch (error) {
             console.error(
               `Error reading style file ${stylePath}: ${error.message}`
