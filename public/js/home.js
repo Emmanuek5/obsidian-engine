@@ -1,5 +1,4 @@
 
-
 const clientCodeButton = document.getElementById("client_code");
 const codeBlocks = document.querySelectorAll(".code_block");
 const serverCodeButton = document.getElementById("server_code");

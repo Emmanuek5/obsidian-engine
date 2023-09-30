@@ -2,9 +2,12 @@
 <div class="base-header">
     <header>
         <div class="header__title">
+               <h1><<$name>></h1>
             <img src="/assets/logo.png" alt="logo">
-            <h1><<$name>></h1>
-            
+
+            <div 
+            class="scene-container">
+            </div>
         </div>
          <div class="top-page">
         <div class="top-page__title">
@@ -27,6 +30,14 @@
 <div class="container-fluid">
 <</nav>>
 </div>
+
+<script>
+    const img = document.querySelector('img');
+    const sceneContainer = document.querySelector('.scene-container');
+    const header = document.querySelector('header');
+    const topPage = document.querySelector('.top-page');
+
+</script>
 
 <</client_code>>
 <</server_code>>
