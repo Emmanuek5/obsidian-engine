@@ -242,6 +242,100 @@ class RenderEngines {
         );
       `,
       },
+      animate3d: {
+        parameters: [
+          "imageElement",
+          "sceneContainer",
+          "width",
+          "height",
+          "shapeType",
+          "rotationStyle",
+        ],
+        modules: [
+          "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js",
+        ],
+        code: `
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true }); // Set alpha to true for a clear background
+    renderer.setSize(width, height);
+    sceneContainer.appendChild(renderer.domElement);
+    
+    // Get the specified image element
+    const image = imageElement;
+    
+    // Adjust the cube dimensions based on width and height parameters
+    let geometry;
+    if (shapeType === "cube") {
+      geometry = new THREE.BoxGeometry(1, 1, 1);
+    } else if (shapeType === "rect") {
+      geometry = new THREE.PlaneGeometry(1, 1);
+    } else {
+      console.error("Invalid shapeType. Supported values are 'cube' and 'rect'.");
+      return;
+    }
+
+    const texture = new THREE.Texture(image);
+    texture.needsUpdate = true; // Ensure the texture updates when the image changes
+
+    const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.5 });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    camera.position.z = 5;
+
+    // Apply rotation style
+    let rotationAnimation;
+    if (rotationStyle === "rotate") {
+      rotationAnimation = { duration: 1, x: Math.PI * 2, y: Math.PI * 2, repeat: -1, ease: "power2.inOut" };
+    } else if (rotationStyle === "scale") {
+      rotationAnimation = { duration: 1, scale: 1.2, yoyo: true, repeat: -1, ease: "power2.inOut" };
+    } else if (rotationStyle === "bounce") {
+      rotationAnimation = { duration: 1, y: 1, yoyo: true, repeat: -1, ease: "power2.inOut" };
+    } else {
+      console.error("Invalid rotationStyle. Supported values are 'rotate', 'scale', and 'bounce'.");
+      return;
+    }
+
+    // Make it interactive
+    gsap.to(cube.rotation, rotationAnimation);
+
+    // Add touch event listeners for interaction
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    function onTouchStart(event) {
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+    }
+
+    function onTouchMove(event) {
+      const touchX = event.touches[0].clientX;
+      const touchY = event.touches[0].clientY;
+
+      const deltaX = touchX - touchStartX;
+      const deltaY = touchY - touchStartY;
+
+      cube.rotation.y += deltaX * 0.01;
+      cube.rotation.x += deltaY * 0.01;
+
+      touchStartX = touchX;
+      touchStartY = touchY;
+    }
+
+    sceneContainer.addEventListener("touchstart", onTouchStart, false);
+    sceneContainer.addEventListener("touchmove", onTouchMove, false);
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  `,
+      },
     };
 
     this.defaultRenderer = defaultRenderer;
@@ -367,81 +461,85 @@ class RenderEngines {
       let layoutContent = fs.readFileSync(layoutFile, "utf8");
       // Replace <<$content>> in the layout with the actual content
       layoutContent = layoutContent.replace(/<<\$content>>/g, content);
- for (const key in options.render_options) {
+      for (const key in options.render_options) {
+        const variable = options[key];
+        const pattern = new RegExp(`<<\\$${key}>>`, "g");
+        layoutContent = layoutContent.replace(pattern, variable);
+      }
 
-   const variable = options[key];
-   const pattern = new RegExp(`<<\\$${key}>>`, "g");
-   layoutContent = layoutContent.replace(pattern, variable);
- }
+      if (options.meta && typeof options.meta === "object") {
+        const customMetaTags = [];
 
-  if (options.meta && typeof options.meta === "object") {
-    const customMetaTags = [];
+        // Loop through the properties in the meta object
+        for (const key in options.meta) {
+          const value = options.meta[key];
+          // Generate an HTML <meta> tag for each property
+          customMetaTags.push(`<meta name="${key}" content="${value}">`);
+        }
 
-    // Loop through the properties in the meta object
-    for (const key in options.meta) {
-      const value = options.meta[key];
-      // Generate an HTML <meta> tag for each property
-      customMetaTags.push(`<meta name="${key}" content="${value}">`);
-    }
+        // Insert the generated custom meta tags into the head of the content
+        layoutContent = layoutContent.replace(
+          /<\/head>/i,
+          `${customMetaTags.join("\n")}\n</head>`
+        );
+      }
 
-    // Insert the generated custom meta tags into the head of the content
-    layoutContent = layoutContent.replace(
-      /<\/head>/i,
-      `${customMetaTags.join("\n")}\n</head>`
-    );
-  }
-
-
- layoutContent = layoutContent.replace(/<\s*<\s*\/([^>]+)>>/g, (match, tagName) => {
-   // Check if the component file exists in the base path using __dirname
-   const componentFilePath = path.join(this.componentPath, tagName + ".html");
-   try {
-     // Read and insert the component content if it exists
-     const componentContent = fs.readFileSync(componentFilePath, "utf8");
-     return componentContent;
-   } catch (error) {
-     // If the component file doesn't exist, return an empty string
-     console.log(error);
-     return "";
-   }
- });
+      layoutContent = layoutContent.replace(
+        /<\s*<\s*\/([^>]+)>>/g,
+        (match, tagName) => {
+          // Check if the component file exists in the base path using __dirname
+          const componentFilePath = path.join(
+            this.componentPath,
+            tagName + ".html"
+          );
+          try {
+            // Read and insert the component content if it exists
+            const componentContent = fs.readFileSync(componentFilePath, "utf8");
+            return componentContent;
+          } catch (error) {
+            // If the component file doesn't exist, return an empty string
+            console.log(error);
+            return "";
+          }
+        }
+      );
       // Include any JavaScript files directly in the HTML content
-       if (options.scripts.length > 0) {
-         for (const script of options.scripts) {
-           const scriptPath = path.join(this.scriptsDir, script);
-           console.log(scriptPath);
-           try {
-             layoutContent = layoutContent.replace(
-               /<\/body>/i,
-               `${this.renderJavascript(
-                 fs.readFileSync(scriptPath, "utf8")
-               )}\n</body>`
-             );
-           } catch (error) {
-             console.error(
-               `Error reading script file ${scriptPath}: ${error.message}`
-             );
-           }
-         }
-       }
+      if (options.scripts.length > 0) {
+        for (const script of options.scripts) {
+          const scriptPath = path.join(this.scriptsDir, script);
+          console.log(scriptPath);
+          try {
+            layoutContent = layoutContent.replace(
+              /<\/body>/i,
+              `${this.renderJavascript(
+                fs.readFileSync(scriptPath, "utf8")
+              )}\n</body>`
+            );
+          } catch (error) {
+            console.error(
+              `Error reading script file ${scriptPath}: ${error.message}`
+            );
+          }
+        }
+      }
 
-       // Include any stylesheets directly in the HTML content
-       if (options.styles.length > 0) {
-         for (const style of options.styles) {
-           const stylePath = path.join(this.stylesDir, style);
-           try {
-             const styleContent = fs.readFileSync(stylePath, "utf8");
-             layoutContent = layoutContent.replace(
-               /<\/body>/i,
-               `<style>${styleContent}</style></body>`
-             );
-           } catch (error) {
-             console.error(
-               `Error reading style file ${stylePath}: ${error.message}`
-             );
-           }
+      // Include any stylesheets directly in the HTML content
+     if (options.styles.length > 0) {
+       for (const style of options.styles) {
+         const stylePath = path.join(this.stylesDir, style);
+         try {
+           const styleContent = fs.readFileSync(stylePath, "utf8");
+           layoutContent = layoutContent.replace(
+             /<\/head>/i,
+             `<style>${styleContent}</style></head>`
+           );
+         } catch (error) {
+           console.error(
+             `Error reading style file ${stylePath}: ${error.message}`
+           );
          }
        }
+     }
 
       // Return the layout content with included scripts and styles
       return layoutContent;
@@ -456,52 +554,53 @@ class RenderEngines {
       const layoutContent = fs.readFileSync(layoutFile, "utf8");
       // Replace <<$content>> in the layout with the actual content
       layoutContent = layoutContent.replace(/<<\$content>>/g, content);
-       for (const key in options.render_options) {
-         const variable = options[key];
-         const pattern = new RegExp(`<<\\$${key}>>`, "g");
-         layoutContent = layoutContent.replace(pattern, variable);
-       }
+      for (const key in options.render_options) {
+        const variable = options[key];
+        const pattern = new RegExp(`<<\\$${key}>>`, "g");
+        layoutContent = layoutContent.replace(pattern, variable);
+      }
 
-        if (options.meta && typeof options.meta === "object") {
-          const customMetaTags = [];
+      if (options.meta && typeof options.meta === "object") {
+        const customMetaTags = [];
 
-          // Loop through the properties in the meta object
-          for (const key in options.meta) {
-            const value = options.meta[key];
-            // Generate an HTML <meta> tag for each property
-            customMetaTags.push(`<meta name="${key}" content="${value}">`);
-          }
-
-          // Insert the generated custom meta tags into the head of the content
-          layoutContent = layoutContent.replace(
-            /<\/head>/i,
-            `${customMetaTags.join("\n")}\n</head>`
-          );
+        // Loop through the properties in the meta object
+        for (const key in options.meta) {
+          const value = options.meta[key];
+          // Generate an HTML <meta> tag for each property
+          customMetaTags.push(`<meta name="${key}" content="${value}">`);
         }
 
+        // Insert the generated custom meta tags into the head of the content
+        layoutContent = layoutContent.replace(
+          /<\/head>/i,
+          `${customMetaTags.join("\n")}\n</head>`
+        );
+      }
 
-       layoutContent = layoutContent.replace(/<\s*<\s*\/([^>]+)>>/g, (match, tagName) => {
-         // Check if the component file exists in the base path using __dirname
-         const componentFilePath = path.join(
-           this.componentPath,
-           tagName + ".html"
-         );
-         try {
-           // Read and insert the component content if it exists
-           const componentContent = fs.readFileSync(componentFilePath, "utf8");
-           return componentContent;
-         } catch (error) {
-           // If the component file doesn't exist, return an empty string
-           console.log(error);
-           return "";
-         }
-       });
+      layoutContent = layoutContent.replace(
+        /<\s*<\s*\/([^>]+)>>/g,
+        (match, tagName) => {
+          // Check if the component file exists in the base path using __dirname
+          const componentFilePath = path.join(
+            this.componentPath,
+            tagName + ".html"
+          );
+          try {
+            // Read and insert the component content if it exists
+            const componentContent = fs.readFileSync(componentFilePath, "utf8");
+            return componentContent;
+          } catch (error) {
+            // If the component file doesn't exist, return an empty string
+            console.log(error);
+            return "";
+          }
+        }
+      );
 
       // Include any JavaScript files directly in the HTML content
       if (options.scripts.length > 0) {
         for (const script of options.scripts) {
           const scriptPath = path.join(this.scriptsDir, script);
-          console.log(scriptPath);
           try {
             layoutContent = layoutContent.replace(
               /<\/body>/i,
@@ -524,8 +623,8 @@ class RenderEngines {
           try {
             const styleContent = fs.readFileSync(stylePath, "utf8");
             layoutContent = layoutContent.replace(
-              /<\/body>/i,
-              `<style>${styleContent}</style></body>`
+              /<\/head>/i,
+              `<style>${styleContent}</style></head>`
             );
           } catch (error) {
             console.error(
@@ -557,10 +656,20 @@ class RenderEngines {
     return content.replace(headTagRegex, `${faviconLinkTag}</head>`);
   }
 
+  addItemtoContent(content, item, tag) {
+    // Create a regular expression to find the </head> tag in a case-insensitive manner
+    const headTagRegex = new RegExp(`<\/${tag}>`, "i");
+
+    // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;
+    return content.replace(headTagRegex, `${item}</${tag}>`);
+  }
+
   renderJavascript(scriptContents) {
     try {
       const scriptContent = scriptContents;
       let modifiedScript = scriptContent;
+      let moduleScripts = ""; // Variable to store module script URLs
+
       // Updated regex to match function calls like lol()
       const functionRegex = /(\w+)\s*\(([^)]*)\);?/g;
       const matches = scriptContent.matchAll(functionRegex);
@@ -568,13 +677,28 @@ class RenderEngines {
       for (const match of matches) {
         const functionName = match[1];
         const functionDefinition = this.functions[functionName];
+
         if (functionDefinition) {
           const functionParameters = functionDefinition.parameters.join(",");
           const parameters = functionDefinition.parameters;
           let code = functionDefinition.code;
+
+          // Check if the function has modules
+          if (
+            functionDefinition.modules &&
+            functionDefinition.modules.length > 0
+          ) {
+            // Add module script URLs to the moduleScripts variable
+            const moduleTags = functionDefinition.modules.map(
+              (moduleURL) => `<script src="${moduleURL}"></script>`
+            );
+            moduleScripts += moduleTags.join("\n");
+          }
+
           const parameterValues = functionParameters.split(",").map((p) => {
             return p.trim();
           });
+
           if (parameters.length === parameterValues.length) {
             for (let i = 0; i < parameters.length; i++) {
               const parameterName = parameters[i];
@@ -582,13 +706,19 @@ class RenderEngines {
               const parameterRegex = new RegExp(`<<\\$${parameterName}>>`, "g");
               code = code.replace(parameterRegex, parameterValue);
             }
+
             // Append the function code to the modifiedScript
             modifiedScript += `\n function ${functionName}(${functionParameters}){\n${code}\n }`;
           }
         }
       }
-
-      return `<script>${modifiedScript}</script>`;
+      if (moduleScripts.length > 0) {
+        // Add the module scripts to the modifiedScript
+      return `${moduleScripts}\n<script>${modifiedScript} \n</script>`;
+      }
+        return `<script>${modifiedScript}</script>`;
+      // Add module script URLs to the head tag
+    
     } catch (error) {
       console.error(`Error: ${error}`);
       return ""; // Return an empty string if there's an error
