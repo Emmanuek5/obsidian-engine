@@ -4,9 +4,10 @@ const usersModel = require("../models/users");
 
 
 //visit http://localhost:3000/api/
-router.basePath = "/";
+router.basePath = "/";1
 
 router.get("/", (req, res) => {
+  usersModel.insert({ username: "test", password: "test" , email: "test"});
   res.send("Hello World");
 });
 

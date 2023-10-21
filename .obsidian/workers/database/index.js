@@ -18,6 +18,7 @@ class Database {
     this.app = express();
     this.port = port || 3000;
     this.remote = remote;
+   
 
     this.app.use(bodyParser.urlencoded({ extended: true }));
     // Add middleware to parse JSON requests
@@ -403,7 +404,7 @@ class Database {
     }
   }
 
-  toSQL(host, username, password, database) {
+  toSQL(host, username, password, database) {0
     const connection = mysql.createConnection({
       host: host,
       user: username,
