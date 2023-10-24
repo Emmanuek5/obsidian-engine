@@ -21,6 +21,18 @@ class Response {
     return this;
   }
 
+  status(statusCode) {
+    this.statusCode = statusCode;
+    return this;
+  }
+
+  json(body) {
+    this.setHeader("Content-Type", "application/json");
+    this.body = JSON.stringify(body);
+    this.response.writeHead(this.statusCode, this.headers);
+    this.response.end(this.body);
+    return this;
+  }
   setHeader(header, value) {
     this.headers[header] = value;
     return this;

@@ -6,19 +6,19 @@ const EventEmitter = require("events"); // Import the EventEmitter module
 const express = require("express");
 const bodyParser = require("body-parser");
 const axios = require("axios");
+const { log } = require("console");
 class Database {
-  constructor(dbName, port , remote = false) {
+  constructor(dbName, port, remote = false) {
     this.dbName = dbName;
     this.tables = {};
     if (!fs.existsSync(path.join(__dirname + "/data"))) {
       fs.mkdirSync(path.join(__dirname + "/data"));
     }
     this.load();
-    this.save();
+
     this.app = express();
     this.port = port || 3000;
     this.remote = remote;
-   
 
     this.app.use(bodyParser.urlencoded({ extended: true }));
     // Add middleware to parse JSON requests
@@ -64,8 +64,9 @@ class Database {
     this.app.listen(this.port, () => {
       console.log(`Database server listening on port ${this.port}`);
     });
+
     setInterval(() => {
-      this.save();
+      this.save()
     }, 5000);
   }
 
@@ -132,8 +133,8 @@ class Database {
       } catch (error) {
         console.error("Error connecting to remote server:", error.message);
       }
-    }else{
-     return false;
+    } else {
+      return false;
     }
   }
 
@@ -210,23 +211,20 @@ class Database {
     if (!table) {
       return res.status(404).json({ error: `Table '${tableName}' not found.` });
     }
-     
+
     const { query, update } = req.body;
-  if (!query || !update) {
+    if (!query || !update) {
       return res
         .status(400)
         .json({ error: "Both query and update data are required." });
     }
 
-    
     if (table.findOneAndUpdate(query, update)) {
       return res.json({ message: "Row updated successfully." });
     } else {
       return res.status(404).json({ error: "Row not found for update." });
     }
-
   }
-      
 
   deleteRowRoute(req, res) {
     const { tableName } = req.params;
@@ -254,7 +252,7 @@ class Database {
       return res.status(404).json({ error: `Table '${tableName}' not found.` });
     }
     const { query } = req.body;
-    if (!query) { 
+    if (!query) {
       return res.status(400).json({ error: "Query data is required." });
     }
 
@@ -264,7 +262,7 @@ class Database {
       return res.status(404).json({ error: "Row not found for deletion." });
     }
   }
-  
+
   deleteAllRoute(req, res) {
     const { tableName } = req.params;
     const table = this.getTable(tableName);
@@ -276,18 +274,16 @@ class Database {
     return res.json({ message: "All rows deleted successfully." });
   }
 
-
   createTableRoute(req, res) {
-    const { tableName , schema } = req.body;
+    const { tableName, schema } = req.body;
     if (!tableName) {
       return res.status(400).json({ error: "Table name is required." });
     }
     if (!schema) {
       return res.status(400).json({ error: "Table schema is required." });
     }
-      
 
-    if (!this.createTable(tableName,schema)) {
+    if (!this.createTable(tableName, schema)) {
       console.log(`Table '${tableName}' already exists.`);
       return res
         .status(400)
@@ -312,7 +308,7 @@ class Database {
     return res.json(table);
   }
 
-  createTable(tableName,schema) {
+  createTable(tableName, schema) {
     if (this.tables[tableName] === undefined) {
       this.tables[tableName] = new Table();
       this.tables[tableName].name = tableName;
@@ -342,29 +338,6 @@ class Database {
     return Object.keys(this.tables);
   }
 
-  save() {
-    const data = {
-      tables: {},
-    };
-    if (!fs.existsSync(path.join(__dirname + "/data"))) {
-      fs.mkdirSync(path.join(__dirname + "/data"));
-    }
-    for (const tableName in this.tables) {
-      data.tables[tableName] = this.tables[tableName].toJSON();
-    }
-
-    const jsonContent = JSON.stringify(data, null, 4);
-
-    fs.writeFileSync(
-      path.join(__dirname + "/data", `${this.dbName}.json`),
-      jsonContent
-    );
-
-    // If 'remote' is enabled, send data to the remote server
-    if (this.remote) {
-      this.sendDataToRemoteServer(jsonContent);
-    }
-  }
 
   // Function to send data to the remote server
   async sendDataToRemoteServer(data) {
@@ -404,7 +377,8 @@ class Database {
     }
   }
 
-  toSQL(host, username, password, database) {0
+  toSQL(host, username, password, database) {
+    0;
     const connection = mysql.createConnection({
       host: host,
       user: username,
@@ -471,6 +445,70 @@ class Database {
     });
   }
 
+  save() {
+    try {
+      const data = {
+        tables: {},
+      };
+
+      // Populate data object with table information
+      for (const tableName in this.tables) {
+        data.tables[tableName] = this.tables[tableName].toJSON();
+      }
+
+      // Construct the file path
+      const filePath = path.join(__dirname, "data", `${this.dbName}.json`);
+
+      // Convert data to JSON format
+      const jsonContent = JSON.stringify(data, null, 4);
+      // Write JSON content to the file
+      fs.writeFileSync(filePath, jsonContent);
+
+      // If 'remote' is enabled, send data to the remote server
+      if (this.remote) {
+        this.sendDataToRemoteServer(jsonContent);
+      }
+    } catch (error) {
+      console.error("Error saving database:", error.message);
+    }
+  }
+
+  load() {
+    const filePath = path.join(__dirname, "data", `${this.dbName}.json`);
+
+    try {
+      if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, JSON.stringify({ tables: {} }, null, 4));
+      }
+
+      const data = fs.readFileSync(filePath, "utf8");
+      const jsonContent = JSON.parse(data);
+
+      for (const tableName in jsonContent.tables) {
+        if (!this.tables[tableName]) {
+          this.tables[tableName] = new Table();
+        }
+        this.tables[tableName].insertData(jsonContent.tables[tableName].data);
+        this.tables[tableName].name = tableName;
+
+        // Set up the 'save' event for each table
+        this.tables[tableName].on("save", () => {
+          console.log(`Table '${tableName}' saved`);
+          this.save();
+        });
+      }
+
+      // If 'remote' is enabled, connect to the remote server
+      if (this.remote) {
+        this.connectToRemoteServer(this.dbName);
+      }
+
+      console.log(`Database '${this.dbName}' loaded successfully`);
+    } catch (error) {
+      console.error("Error loading database:", error.message);
+    }
+  }
+
   add(module) {
     if (typeof module === "object" && module instanceof Table) {
       if (module.name !== "") {
@@ -479,15 +517,13 @@ class Database {
           module.on("save", () => {
             this.save();
           });
-          this.save()
           return true;
         } else {
-          // Table already exists, append data to the existing table
-          this.tables[module.name].insertData(module.data);
+          // Table already exists, merge data with the existing table
+          module.insertData(this.tables[module.name].data);
           module.on("save", () => {
             this.save();
           });
-          this.save()
           return true;
         }
       } else {
@@ -497,32 +533,6 @@ class Database {
     } else {
       console.error("The table module must be an instance of Table.");
       return false;
-    }
-  }
-
-  load() {
-    if (!fs.existsSync(path.join(__dirname + "/data/"+this.dbName+".json"))) {
-      fs.writeFileSync(
-        path.join(__dirname + "/data", `${this.dbName}.json`),
-        JSON.stringify({ tables: {} }, null, 4)
-      );
-    }
-    const data = fs.readFileSync(
-      path.join(__dirname + "/data", `${this.dbName}.json`),
-      "utf8"
-    );
-
-    const jsonContent = JSON.parse(data);
-
-    for (const tableName in jsonContent.tables) {
-      const table = new Table();
-      table.insertData(jsonContent.tables[tableName].data);
-      this.tables[tableName] = table;
-    }
-
-    // If 'remote' is enabled, connect to the remote server
-    if (this.remote) {
-      this.connectToRemoteServer(this.dbName);
     }
   }
 }
@@ -548,7 +558,6 @@ class Table extends EventEmitter {
     this.schema = schema;
   }
 
-
   /**
    * Inserts a row into the table.
    *
@@ -556,46 +565,58 @@ class Table extends EventEmitter {
    * @return {boolean} Returns true if the row was successfully inserted, false otherwise.
    */
   insert(row) {
-    // Validate that the inserted row matches the schema
-    const schemaKeys = Object.keys(this.schema);
-    const rowKeys = Object.keys(row);
+  // Validate that the inserted row matches the schema
+  const schemaKeys = Object.keys(this.schema);
+  const rowKeys = Object.keys(row);
 
-    if (!schemaKeys.every((key) => rowKeys.includes(key))) {
-      console.error("Inserted row doesn't match the table schema.");
+  if (!schemaKeys.every((key) => rowKeys.includes(key))) {
+    console.error("Inserted row doesn't match the table schema.");
+    return false;
+  }
+
+  for (const key in this.schema) {
+    if (this.schema[key].required && !row[key]) {
+      console.error(`Column '${key}' is required but not provided in the inserted row.`);
       return false;
     }
 
-    for (const key in this.schema) {
-      if (this.schema[key].required && !row[key]) {
-        console.error(
-          `Column '${key}' is required but not provided in the inserted row.`
-        );
-        return false;
-      }
+    // Check if the type is defined in the schema
+    if (this.schema[key].type) {
+      const expectedType = this.schema[key].type;
+      const actualType = typeof row[key];
 
-      if (this.schema[key].unique) {
-        // Check uniqueness for columns marked as unique
-        const isUnique = !this.data.some(
-          (existingRow) => existingRow[key] === row[key]
-        );
-
-        if (!isUnique) {
-            
-          console.error(
-            `Column '${key}' must be unique, but a duplicate value exists.`
-          );
-           return false;
-        }
+      // Check if the actual type matches the expected type
+      if (actualType !== expectedType) {
+        console.error(`Column '${key}' must be of type '${expectedType}', but got '${actualType}'.`);
+        const array = [
+          false,
+          `Column '${key}' must be of type '${expectedType}', but got '${actualType}'.`,
+        ];
+        return array;
       }
     }
 
-    this.data.push(row);
-    this.addId();
-    this.emit("save");
-    return true;
-    // Emit the 'save' event after inserting a row
+    if (this.schema[key].unique) {
+      // Check uniqueness for columns marked as unique
+      const isUnique = !this.data.some((existingRow) => existingRow[key] === row[key]);
+
+      if (!isUnique) {
+        console.error(`Column '${key}' must be unique, but a duplicate value exists.`);
+        return false;
+      }
+    }
   }
 
+  this.data.push(row);
+  this.addId();
+  this.emit("save");
+  return this;
+  // Emit the 'save' event after inserting a row
+}
+
+  insertOne(row) {
+    return this.insert(row);
+  }
   insertData(data) {
     this.data = data;
     this.emit("save");
@@ -618,6 +639,14 @@ class Table extends EventEmitter {
    * @return {Array} - An array of rows that match the query.
    */
   find(query) {
+    if (
+      query === undefined ||
+      query === null ||
+      Object.keys(query).length === 0 ||
+      query == {}
+    ) {
+      return this.data;
+    }
     const results = [];
     for (const row of this.data) {
       let match = true;
@@ -642,8 +671,10 @@ class Table extends EventEmitter {
       return null;
     }
   }
-  
 
+  save() {
+    return true;
+  }
   /**
    * Find and update a row in the database based on the given query and update.
    *
@@ -719,8 +750,6 @@ class Table extends EventEmitter {
     // Emit the 'save' event after deleting a row
   }
 
-
-
   /**
    * Delete all the elements in the data array that match the given query.
    *
@@ -730,6 +759,7 @@ class Table extends EventEmitter {
   deleteAll() {
     this.data = [];
     this.emit("save");
+    this.save();
   }
 }
 

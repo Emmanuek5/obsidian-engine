@@ -115,6 +115,7 @@ function registerRoute(route, folder, fileName) {
 
 
 
+
 app.get("/favicon.ico", (req, res) => {
   const faviconPath = path.join(process.cwd(), "public/favicon.ico");
   if (fs.existsSync(faviconPath)) {
