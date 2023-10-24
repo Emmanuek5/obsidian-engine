@@ -1,7 +1,7 @@
 {
   "layout": "main",
-  "scripts": [],
-  "styles": [],
+  "scripts": ["home.js"],
+  "styles": ["home.css"],
   "render_options": {
     "title": "Home",
     "name": "Obsidian Engine"

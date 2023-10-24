@@ -1,7 +1,7 @@
 {
   "name": "An Obsidian App",
   "view_engine": "html",
-  "port": 80,
+  "port": 25565,
   "db_port": 27017,
   "db_name": "obsidian",
   "db_url": "",
