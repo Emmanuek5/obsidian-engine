@@ -546,13 +546,32 @@ class Table extends EventEmitter {
   }
 
   addId() {
+    let idAdded = false;
     let id = 1;
+
     for (const row of this.data) {
-      row._id = id;
+      // Check if _id already exists
+      if (row._id === undefined) {
+        // If not, set it to the current id
+        row._id = id;
+        idAdded = true;
+      }
+
+      // Check if id already exists
+      if (row.id === undefined) {
+        // If not, set it to the current id
+        row.id = row._id;
+        idAdded = true;
+      } else {
+        // If id already exists, make sure _id is the same
+        row._id = row.id;
+      }
+
       id++;
     }
-  }
 
+    return idAdded;
+  }
   // Set the table schema with unique constraints
   setSchema(schema) {
     this.schema = schema;
@@ -565,54 +584,62 @@ class Table extends EventEmitter {
    * @return {boolean} Returns true if the row was successfully inserted, false otherwise.
    */
   insert(row) {
-  // Validate that the inserted row matches the schema
-  const schemaKeys = Object.keys(this.schema);
-  const rowKeys = Object.keys(row);
+    // Validate that the inserted row matches the schema
+    const schemaKeys = Object.keys(this.schema);
+    const rowKeys = Object.keys(row);
 
-  if (!schemaKeys.every((key) => rowKeys.includes(key))) {
-    console.error("Inserted row doesn't match the table schema.");
-    return false;
-  }
-
-  for (const key in this.schema) {
-    if (this.schema[key].required && !row[key]) {
-      console.error(`Column '${key}' is required but not provided in the inserted row.`);
+    if (!schemaKeys.every((key) => rowKeys.includes(key))) {
+      console.error("Inserted row doesn't match the table schema.");
       return false;
     }
 
-    // Check if the type is defined in the schema
-    if (this.schema[key].type) {
-      const expectedType = this.schema[key].type;
-      const actualType = typeof row[key];
-
-      // Check if the actual type matches the expected type
-      if (actualType !== expectedType) {
-        console.error(`Column '${key}' must be of type '${expectedType}', but got '${actualType}'.`);
-        const array = [
-          false,
-          `Column '${key}' must be of type '${expectedType}', but got '${actualType}'.`,
-        ];
-        return array;
-      }
-    }
-
-    if (this.schema[key].unique) {
-      // Check uniqueness for columns marked as unique
-      const isUnique = !this.data.some((existingRow) => existingRow[key] === row[key]);
-
-      if (!isUnique) {
-        console.error(`Column '${key}' must be unique, but a duplicate value exists.`);
+    for (const key in this.schema) {
+      if (this.schema[key].required && !row[key]) {
+        console.error(
+          `Column '${key}' is required but not provided in the inserted row.`
+        );
         return false;
       }
-    }
-  }
 
-  this.data.push(row);
-  this.addId();
-  this.emit("save");
-  return this;
-  // Emit the 'save' event after inserting a row
-}
+      // Check if the type is defined in the schema
+      if (this.schema[key].type) {
+        const expectedType = this.schema[key].type;
+        const actualType = typeof row[key];
+
+        // Check if the actual type matches the expected type
+        if (actualType !== expectedType) {
+          console.error(
+            `Column '${key}' must be of type '${expectedType}', but got '${actualType}'.`
+          );
+          const array = [
+            false,
+            `Column '${key}' must be of type '${expectedType}', but got '${actualType}'.`,
+          ];
+          return array;
+        }
+      }
+
+      if (this.schema[key].unique) {
+        // Check uniqueness for columns marked as unique
+        const isUnique = !this.data.some(
+          (existingRow) => existingRow[key] === row[key]
+        );
+
+        if (!isUnique) {
+          console.error(
+            `Column '${key}' must be unique, but a duplicate value exists.`
+          );
+          return false;
+        }
+      }
+    }
+
+    this.data.push(row);
+    this.addId();
+    this.emit("save");
+    return this;
+    // Emit the 'save' event after inserting a row
+  }
 
   insertOne(row) {
     return this.insert(row);
