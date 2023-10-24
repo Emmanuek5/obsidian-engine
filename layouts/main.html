@@ -1,20 +1,145 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;1,100;1,300&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> <<$title>> </title>
-</head>
-<style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Knight Network</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
 
-</style>
+      header {
+        background-color: rgb(0, 0, 0);
+        color: white;
+        padding: 15px;
+      }
 
-<<$content>>
+      a {
+        text-decoration: none;
+        color: white;
+      }
 
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header_left {
+        display: flex;
+        align-items: center;
+      }
+
+      .header_left img {
+        width: 30px;
+        margin-right: 10px;
+      }
+
+      .header_right ul {
+        list-style: none;
+        display: flex;
+      }
+
+      .header_right li {
+        margin-right: 15px;
+      }
+
+      .header_right a {
+        text-decoration: none;
+      }
+
+      .header_right button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5%;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+      }
+
+      .header_right button:hover {
+        background-color: #2980b9;
+      }
+
+      table {
+        width: 80%;
+        margin: 20px auto;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #3498db;
+        color: white;
+      }
+
+      .about_me,
+      .owners {
+        text-align: left;
+        margin: 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        color: black;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .owners {
+        margin-top: 20px;
+      }
+
+      .owner_block {
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 1px solid #bdc3c7;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .owner_block h2 {
+        color: #3498db;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="header_left">
+          <img src="/assets/logo.png" alt="logo" />
+          <a href="/"><h1>Knight Network</h1></a>
+        </div>
+        <div class="header_right">
+          <ul>
+            <li>
+              <a href="/"><button>Home</button></a>
+            </li>
+            <li>
+              <a href="/about"><button>About</button></a>
+            </li>
+            <li>
+              <a href="/forums"><button>Forums</button></a>
+            </li>
+            <li>
+              <a href="/bans"><button>Bans</button></a>
+            </li>
+            <li>
+              <a href="/contact"><button>Contact</button></a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <<$content>>
+  </body>
 </html>
