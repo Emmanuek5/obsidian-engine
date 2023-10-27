@@ -1,7 +1,5 @@
 const url = require("url");
-const formidable = require("formidable");
 const querystring = require("querystring");
-
 
 class Request {
   constructor(httpRequest) {
@@ -12,12 +10,18 @@ class Request {
     this.body = "";
     this.params = {};
     this.files = {};
+    this.cookies = {};
+    this.session = {};
+    this.user = null;
+    this.ip = httpRequest.socket ? httpRequest.socket.remoteAddress : null;
 
     // Listen for data events to collect request body
     httpRequest.on("data", (chunk) => {
       this.body += chunk.toString();
       this.parseBody();
     });
+
+    this.parseCookies();
   }
 
   getBody() {
@@ -39,6 +43,12 @@ class Request {
     }
   }
 
+  parseCookies() {
+    const cookieHeader = this.headers && this.headers.cookie;
+    if (cookieHeader) {
+      this.cookies = querystring.parse(cookieHeader, "; ");
+    }
+  }
   parseFormUrlEncoded() {
     const formDataPairs = this.body.split("&");
     const formData = {};
@@ -95,12 +105,17 @@ class Request {
         file.type = fileType;
 
         // Check if file data is base64 encoded
-const isBase64 = lines[2] && lines[2].includes("Content-Transfer-Encoding: base64");
+        const isBase64 =
+          lines[2] && lines[2].includes("Content-Transfer-Encoding: base64");
 
-// Extract file data
-const fileDataLines = isBase64 ? lines.slice(4, -1) : lines.slice(3, -1);
-const fileData = isBase64 ? fileDataLines.join("") : fileDataLines.join("\r\n");
-file.data = isBase64 ? Buffer.from(fileData, "base64") : fileData;
+        // Extract file data
+        const fileDataLines = isBase64
+          ? lines.slice(4, -1)
+          : lines.slice(3, -1);
+        const fileData = isBase64
+          ? fileDataLines.join("")
+          : fileDataLines.join("\r\n");
+        file.data = isBase64 ? Buffer.from(fileData, "base64") : fileData;
         // Add file to files object
         files[fileName] = file;
       } else {
@@ -149,7 +164,6 @@ file.data = isBase64 ? Buffer.from(fileData, "base64") : fileData;
     try {
       return JSON.parse(this.body);
     } catch (error) {
-      console.error("Error parsing JSON:", error);
       return null;
     }
   }

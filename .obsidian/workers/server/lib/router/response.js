@@ -7,7 +7,8 @@ class Response {
     this.response = httpResponse;
     this.statusCode = 200; // Default status code is 200 OK
     this.headers = {
-      "Content-Type": "text/html", // Default content type is plain text
+      "Content-Type": "text/html",
+      Engine: "Obsidian Engine",
     };
     this.mainPath = process.cwd() + "/pages";
     this.rendered = false;
@@ -19,6 +20,38 @@ class Response {
   setStatus(statusCode) {
     this.statusCode = statusCode;
     return this;
+  }
+
+  setCookie(name, value, options = {}) {
+    const cookie = `${name}=${value}`;
+
+    if (options.expires) {
+      cookie += `; Expires=${options.expires.toUTCString()}`;
+    }
+
+    if (options.maxAge) {
+      cookie += `; Max-Age=${options.maxAge}`;
+    }
+
+    if (options.domain) {
+      cookie += `; Domain=${options.domain}`;
+    }
+
+    if (options.path) {
+      cookie += `; Path=${options.path}`;
+    }
+
+    if (options.secure) {
+      cookie += "; Secure";
+    }
+
+    if (options.httpOnly) {
+      cookie += "; HttpOnly";
+    }
+
+    this.headers["Set-Cookie"] = this.headers["Set-Cookie"]
+      ? `${this.headers["Set-Cookie"]}; ${cookie}`
+      : cookie;
   }
 
   status(statusCode) {
@@ -42,6 +75,12 @@ class Response {
     this.body = body;
     this.response.writeHead(this.statusCode, this.headers);
     this.response.end(this.body);
+    return this;
+  }
+
+  redirect(url) {
+    this.response.writeHead(302, { Location: url });
+    this.response.end();
     return this;
   }
 
@@ -69,19 +108,18 @@ class Response {
 
   render(file, options) {
     if (this.viewEngine) {
-     if (this.viewEngine == "html") {
-       const renderEngine = new RenderEngines();
-       const engine = renderEngine.getRenderer(this.viewEngine);
-       this.body = engine(file, options);
-       this.rendered = true;
-       this.setHeader("Content-Type", "text/html");
-       this.response.writeHead(this.statusCode, this.headers);
-       this.response.end(this.body);
-       return this;
-      
-     }
+      if (this.viewEngine == "html") {
+        const renderEngine = new RenderEngines();
+        const engine = renderEngine.getRenderer(this.viewEngine);
+        this.body = engine(file, options);
+        this.rendered = true;
+        this.setHeader("Content-Type", "text/html");
+        this.response.writeHead(this.statusCode, this.headers);
+        this.response.end(this.body);
+        return this;
+      }
     } else {
-      this.renderedFile = path.join(this.mainPath, file+".html");
+      this.renderedFile = path.join(this.mainPath, file + ".html");
       this.rendered = true;
       this.setHeader("Content-Type", "text/html");
       this.body = fs.readFileSync(this.renderedFile, "utf8");

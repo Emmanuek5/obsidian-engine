@@ -66,7 +66,7 @@ class Database {
     });
 
     setInterval(() => {
-      this.save()
+      this.save();
     }, 5000);
   }
 
@@ -337,7 +337,6 @@ class Database {
   listTables() {
     return Object.keys(this.tables);
   }
-
 
   // Function to send data to the remote server
   async sendDataToRemoteServer(data) {
@@ -690,6 +689,12 @@ class Table extends EventEmitter {
     return results;
   }
 
+  /**
+   * Find and return the first result that matches the given query.
+   *
+   * @param {} query - The query object used to filter the results.
+   * @return {Object|null} The first result that matches the query, or null if no match is found.
+   */
   findOne(query) {
     const results = this.find(query);
     if (results.length > 0) {
@@ -697,6 +702,32 @@ class Table extends EventEmitter {
     } else {
       return null;
     }
+  }
+
+  findByOr(query) {
+    if (
+      query === undefined ||
+      query === null ||
+      Object.keys(query).length === 0 ||
+      query == {}
+    ) {
+      return this.data;
+    }
+
+    const results = [];
+    for (const row of this.data) {
+      let match = false;
+      for (const key in query) {
+        if (row[key] === query[key]) {
+          match = true;
+          break;
+        }
+      }
+      if (match) {
+        results.push(row);
+      }
+    }
+    return results;
   }
 
   save() {
