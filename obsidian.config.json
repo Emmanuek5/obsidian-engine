@@ -1,7 +1,7 @@
 {
   "name": "An Obsidian App",
   "view_engine": "html",
-  "port": 3000,
+  "port": 25565,
   "db_port": 27017,
   "db_name": "obsidian",
   "db_url": "",
@@ -9,7 +9,6 @@
   "no_imports": false,
   "workers": {
     "api": {
-      "port": 3001,
       "path": "/api",
       "enabled": true,
       "restricted": false

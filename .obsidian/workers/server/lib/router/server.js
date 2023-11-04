@@ -6,7 +6,10 @@ const { Router } = require("./router");
 const eventEmitter = new event.EventEmitter();
 const fs = require("fs");
 const path = require("path");
-
+const querystring = require("querystring");
+const COOKIES_DIR = path.join(process.cwd(), ".obsidian/cookies");
+const uuid = require("uuid");
+const sessions = [];
 class Server extends event.EventEmitter {
   constructor(viewEngine) {
     super();
@@ -15,21 +18,140 @@ class Server extends event.EventEmitter {
     this.on = eventEmitter.on;
     this.emit = eventEmitter.emit;
     this.viewEngine = viewEngine;
-   
+
+    if (!fs.existsSync(COOKIES_DIR)) {
+      fs.mkdirSync(COOKIES_DIR);
+    }
   }
 
   handleRequest(req, res) {
     const request = new Request(req);
     const response = new Response(res);
+
     response.viewEngine = this.viewEngine;
 
     // Record the start time when the request is received
     const startTime = new Date();
 
-    // Your routing logic goes here based on request.path
-    // You can use request.method to handle different HTTP methods (GET, POST, etc.)
-    // You can use request.headers to handle different headers
+    // Parse the body and handle the request
+    this.setupSession(request, response);
+    this.parseRequestBody(request)
+      .then(() => {
+        this.handleParsedRequest(request, response, startTime);
+      })
+      .catch((error) => {
+        console.error("Error parsing request body:", error);
+      });
+  }
 
+  /**
+   * Sets up a session for the given request.
+   *
+   * @param {Request} request - The request object.
+   * @param {Response} response - The response object.
+   * @return {void} This function does not return anything.
+   */
+  setupSession(request, response) {
+    const sessionId = request.cookies["session_id"];
+
+    if (sessionId) {
+      // Load existing session
+      request.session = this.loadSession(sessionId);
+      if (request.session.user) {
+        request.user = request.session.user;
+      }
+
+      request.session.save = () => {
+        this.saveSession(request.session);
+      };
+
+      request.session.destroy = () => {
+        request.session = this.createSession(sessionId);
+        this.saveSession(request.session);
+      };
+    } else {
+      // Create a new session
+      const newSessionId = uuid.v4();
+      request.session = this.createSession(newSessionId);
+
+      request.session.save = () => {
+        this.saveSession(request.session);
+      };
+
+      request.session.destroy = () => {
+        request.session = this.createSession(sessionId);
+        this.saveSession(request.session);
+      };
+
+      // Set the session ID cookie in the response
+      response.setCookie("session_id", newSessionId);
+    }
+  }
+
+  createSession(sessionId) {
+    const session = {
+      id: sessionId,
+      data: {},
+    };
+    this.saveSession(session);
+    return session;
+  }
+
+  loadSession(sessionId) {
+    const sessionFilePath = path.join(COOKIES_DIR, `${sessionId}.json`);
+
+    try {
+      if (fs.existsSync(sessionFilePath)) {
+        const sessionData = fs.readFileSync(sessionFilePath, "utf-8");
+        const session = JSON.parse(sessionData);
+        return session;
+      } else {
+        return this.createSession(sessionId);
+      }
+    } catch (error) {
+      // Session file not found or invalid, create a new session
+      console.error("Error loading session:", error);
+      return this.createSession(sessionId);
+    }
+  }
+
+  saveSession(session) {
+    const sessionFilePath = path.join(COOKIES_DIR, `${session.id}.json`);
+    fs.writeFileSync(sessionFilePath, JSON.stringify(session), "utf-8");
+  }
+  /**
+   * Parses the request body based on the content type.
+   *
+   * @param {Request} request - The request object.
+   * @return {Promise} A promise that resolves when the body is parsed.
+   */
+  async parseRequestBody(request) {
+    return new Promise(async (resolve, reject) => {
+      const contentType = request.headers["content-type"];
+      if (contentType && contentType.includes("application/json")) {
+        // Parse JSON body
+        request.getBodyAsJSON();
+        resolve();
+      } else if (contentType && contentType.includes("multipart/form-data")) {
+        // Parse multipart/form-data
+        await request.parseFormData().then(() => {
+          resolve();
+        });
+      } else if (
+        contentType &&
+        contentType.includes("application/x-www-form-urlencoded")
+      ) {
+        // Parse x-www-form-urlencoded
+        request.parseFormUrlEncoded();
+        resolve();
+      } else {
+        // No parsing needed for other content types
+        resolve();
+      }
+    });
+  }
+
+  handleParsedRequest(request, response, startTime) {
     const { path, method } = request;
 
     // Parse query parameters from the request URL
@@ -46,28 +168,25 @@ class Server extends event.EventEmitter {
        * @param {Object} queryParameters - The parsed query parameters.
        * @returns {undefined} This function does not return anything.
        */
+
+      // Parse the body for POST requests
+
       routeHandler(request, response);
 
       // Calculate the time taken to process the request in milliseconds
       const endTime = new Date();
       const elapsedTime = endTime - startTime;
-
       // Log the request with method, path, status code, and milliseconds
       console.log(
-        `${request.method} ${
-          request.path
-        } ${response.statusCode} ${elapsedTime}ms`
+        `${request.method} ${request.path} ${response.statusCode} ${elapsedTime}ms`
       );
     } else {
-      // Handle other routes or methods here
-      response.setStatus(404).send("Not Found");
-
-      // Calculate the time taken to process the request in milliseconds
       const endTime = new Date();
       const elapsedTime = endTime - startTime;
-
-      // Log the request with method, path, 404 status code, and milliseconds
-      console.log(`${request.method} ${request.path} 404 ${elapsedTime}ms`);
+      response.setStatus(404).send("Not Found");
+      console.log(
+        `${request.method} ${request.path} ${response.statusCode} ${elapsedTime}ms`
+      );
     }
   }
 
@@ -136,7 +255,10 @@ class Server extends event.EventEmitter {
         });
       } else {
         const routerModule = require(file);
-
+        const addRouteWithBasePath = (routePath, method, handler) => {
+          const fullPath = path.join(basePath, routePath).replace(/\\/g, "/");
+          this.addRoute(fullPath, method, handler);
+        };
         // Check if the file is a Router instance or has routes
         if (routerModule instanceof Router || routerModule.routes) {
           // Add your existing route handling logic here
@@ -148,7 +270,7 @@ class Server extends event.EventEmitter {
 
           for (const path in routerRoutes) {
             for (const method in routerRoutes[path]) {
-              this.routes[basePath][method] = routerRoutes[path][method];
+              addRouteWithBasePath(path, method, routerRoutes[path][method]);
             }
           }
         } else {
