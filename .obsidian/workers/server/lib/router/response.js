@@ -9,11 +9,15 @@ class Response {
     this.headers = {
       "Content-Type": "text/html",
       Engine: "Obsidian Engine",
+      Engine_Version: require("../../../../../package.json").version,
+      Engine_Author: require("../../../../../package.json").author,
+      Engine_License: require("../../../../../package.json").license,
+      Engine_Repo: require("../../../../../package.json").repository.url,
     };
     this.mainPath = process.cwd() + "/pages";
     this.rendered = false;
     this.renderedFile = "";
-    this.viewEngine = this.response.viewEngine;
+    this.viewEngine = "html";
     this.body = "";
   }
 
@@ -107,8 +111,9 @@ class Response {
   }
 
   render(file, options) {
-    if (this.viewEngine) {
-      if (this.viewEngine == "html") {
+    const viewEngine = this.viewEngine;
+    if (viewEngine) {
+      if (viewEngine == "html") {
         const renderEngine = new RenderEngines();
         const engine = renderEngine.getRenderer(this.viewEngine);
         this.body = engine(file, options);

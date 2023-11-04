@@ -587,17 +587,22 @@ class Table extends EventEmitter {
     const schemaKeys = Object.keys(this.schema);
     const rowKeys = Object.keys(row);
 
-    if (!schemaKeys.every((key) => rowKeys.includes(key))) {
-      console.error("Inserted row doesn't match the table schema.");
-      return false;
-    }
-
     for (const key in this.schema) {
-      if (this.schema[key].required && !row[key]) {
+      // Check if the key is required and not provided (unless it has a default)
+      if (
+        this.schema[key].required &&
+        !rowKeys.includes(key) &&
+        this.schema[key].default === undefined
+      ) {
         console.error(
           `Column '${key}' is required but not provided in the inserted row.`
         );
         return false;
+      }
+
+      // Check if the default value is defined in the schema
+      if (this.schema[key].default !== undefined && row[key] === undefined) {
+        row[key] = this.schema[key].default;
       }
 
       // Check if the type is defined in the schema
@@ -662,7 +667,7 @@ class Table extends EventEmitter {
    * Finds and returns a list of rows from the data that match the given query.
    *
    * @param {Object} query - The query to match the rows against.
-   * @return {Array} - An array of rows that match the query.
+   * @return {Table} - An array of rows that match the query.
    */
   find(query) {
     if (
