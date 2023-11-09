@@ -66,7 +66,7 @@ class Database {
     });
 
     setInterval(() => {
-      this.save()
+      this.save();
     }, 5000);
   }
 
@@ -338,7 +338,6 @@ class Database {
     return Object.keys(this.tables);
   }
 
-
   // Function to send data to the remote server
   async sendDataToRemoteServer(data) {
     try {
@@ -588,17 +587,22 @@ class Table extends EventEmitter {
     const schemaKeys = Object.keys(this.schema);
     const rowKeys = Object.keys(row);
 
-    if (!schemaKeys.every((key) => rowKeys.includes(key))) {
-      console.error("Inserted row doesn't match the table schema.");
-      return false;
-    }
-
     for (const key in this.schema) {
-      if (this.schema[key].required && !row[key]) {
+      // Check if the key is required and not provided (unless it has a default)
+      if (
+        this.schema[key].required &&
+        !rowKeys.includes(key) &&
+        this.schema[key].default === undefined
+      ) {
         console.error(
           `Column '${key}' is required but not provided in the inserted row.`
         );
         return false;
+      }
+
+      // Check if the default value is defined in the schema
+      if (this.schema[key].default !== undefined && row[key] === undefined) {
+        row[key] = this.schema[key].default;
       }
 
       // Check if the type is defined in the schema
@@ -663,7 +667,7 @@ class Table extends EventEmitter {
    * Finds and returns a list of rows from the data that match the given query.
    *
    * @param {Object} query - The query to match the rows against.
-   * @return {Array} - An array of rows that match the query.
+   * @return {Table} - An array of rows that match the query.
    */
   find(query) {
     if (
@@ -690,6 +694,12 @@ class Table extends EventEmitter {
     return results;
   }
 
+  /**
+   * Find and return the first result that matches the given query.
+   *
+   * @param {} query - The query object used to filter the results.
+   * @return {Object|null} The first result that matches the query, or null if no match is found.
+   */
   findOne(query) {
     const results = this.find(query);
     if (results.length > 0) {
@@ -697,6 +707,32 @@ class Table extends EventEmitter {
     } else {
       return null;
     }
+  }
+
+  findByOr(query) {
+    if (
+      query === undefined ||
+      query === null ||
+      Object.keys(query).length === 0 ||
+      query == {}
+    ) {
+      return this.data;
+    }
+
+    const results = [];
+    for (const row of this.data) {
+      let match = false;
+      for (const key in query) {
+        if (row[key] === query[key]) {
+          match = true;
+          break;
+        }
+      }
+      if (match) {
+        results.push(row);
+      }
+    }
+    return results;
   }
 
   save() {

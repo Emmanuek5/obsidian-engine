@@ -389,6 +389,7 @@ class RenderEngines {
       options = Object.assign(options, optionsJson.render_options);
       options.meta = meta;
     }
+
     content = fs.readFileSync(filePath, "utf8");
     // Exclude the options.config property
     if (options.config) {
@@ -454,11 +455,13 @@ class RenderEngines {
       const optionsFile = fs.readFileSync(optionsFilePath, "utf8");
       const optionsJson = JSON.parse(optionsFile);
       options = Object.assign(options, optionsJson);
+      options.render_options.authenticated = options.authenticated;
       const layoutFile = path.join(
         this.layoutPath,
         optionsJson.layout + ".html"
       );
       let layoutContent = fs.readFileSync(layoutFile, "utf8");
+
       // Replace <<$content>> in the layout with the actual content
       layoutContent = layoutContent.replace(/<<\$content>>/g, content);
       for (const key in options.render_options) {
@@ -524,22 +527,22 @@ class RenderEngines {
       }
 
       // Include any stylesheets directly in the HTML content
-     if (options.styles.length > 0) {
-       for (const style of options.styles) {
-         const stylePath = path.join(this.stylesDir, style);
-         try {
-           const styleContent = fs.readFileSync(stylePath, "utf8");
-           layoutContent = layoutContent.replace(
-             /<\/head>/i,
-             `<style>${styleContent}</style></head>`
-           );
-         } catch (error) {
-           console.error(
-             `Error reading style file ${stylePath}: ${error.message}`
-           );
-         }
-       }
-     }
+      if (options.styles.length > 0) {
+        for (const style of options.styles) {
+          const stylePath = path.join(this.stylesDir, style);
+          try {
+            const styleContent = fs.readFileSync(stylePath, "utf8");
+            layoutContent = layoutContent.replace(
+              /<\/head>/i,
+              `<style>${styleContent}</style></head>`
+            );
+          } catch (error) {
+            console.error(
+              `Error reading style file ${stylePath}: ${error.message}`
+            );
+          }
+        }
+      }
 
       // Return the layout content with included scripts and styles
       return layoutContent;
@@ -547,11 +550,12 @@ class RenderEngines {
       const optionsFile = fs.readFileSync(defaultOptionsFilePath, "utf8");
       const optionsJson = JSON.parse(optionsFile);
       options = Object.assign(options, optionsJson);
+      options.render_options.authenticated = options.authenticated;
       const layoutFile = path.join(
         this.layoutPath,
         optionsJson.layout + ".html"
       );
-      const layoutContent = fs.readFileSync(layoutFile, "utf8");
+      let layoutContent = fs.readFileSync(layoutFile, "utf8");
       // Replace <<$content>> in the layout with the actual content
       layoutContent = layoutContent.replace(/<<\$content>>/g, content);
       for (const key in options.render_options) {
@@ -714,11 +718,10 @@ class RenderEngines {
       }
       if (moduleScripts.length > 0) {
         // Add the module scripts to the modifiedScript
-      return `${moduleScripts}\n<script>${modifiedScript} \n</script>`;
+        return `${moduleScripts}\n<script>${modifiedScript} \n</script>`;
       }
-        return `<script>${modifiedScript}</script>`;
+      return `<script>${modifiedScript}</script>`;
       // Add module script URLs to the head tag
-    
     } catch (error) {
       console.error(`Error: ${error}`);
       return ""; // Return an empty string if there's an error

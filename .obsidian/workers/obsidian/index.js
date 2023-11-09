@@ -6,6 +6,11 @@ const path = require("path");
 const fs = require("fs");
 const ps = require("ps-node"); // Import the ps-node package
 const { COLORS } = require("./colours");
+const builderpath = path.join(
+  process.cwd(),
+  ".obsidian/workers/builder/index.js"
+);
+const { Builder } = require(builderpath);
 
 const args = process.argv.slice(2);
 const mode_types = ["dev", "run", "build"];
@@ -39,10 +44,6 @@ if (!fs.existsSync(args[0])) {
   process.exit(1);
 }
 
-const { Builder } = require(path.join(
-  workingPath,
-  ".obsidian/workers/builder/index.js"
-));
 const { Config } = require(path.join(
   workingPath,
   ".obsidian/workers/config/index.js"
@@ -75,48 +76,21 @@ function startNodeProcess() {
       logger(COLORS.RED_TEXT + "ENGINE EXITED. Restarting...");
       startNodeProcess(); // Restart the Node.js process
     });
+    nodeProcess.on("close", function (code, signal) {
+      nodeProcess = null;
+      processExited = true;
+      logger(COLORS.RED_TEXT + "ENGINE EXITED. BYE BYE");
+      process.exit(0);
+    });
   }
 }
 
-const watcher = chokidar.watch(path.join(workingPath, "/pages"), {
-  ignored: /(^|[\/\\])\../,
-  persistent: true,
-});
-
-watcher.on("ready", () => {
-  watcher.on("all", (event, path) => {
-    logger("Clearing /pages/ module cache from server");
-    Object.keys(require.cache).forEach((id) => {
-      if (/[\/\\]pages[\/\\]/.test(id)) delete require.cache[id];
-    });
-    logger(`File changed ${path}`);
-    stopNodeProcessByPort(config.get("port")); // Replace with the desired port to stop
-    // No need to startNodeProcess here; it's automatically restarted in the 'exit' handler
-  });
-});
-
-
-
-// Function to stop a process by port
-function stopNodeProcessByPort(port) {
-  ps.lookup(
-    {
-      command: "node",
-      arguments: args,
-    },
-    (err, resultList) => {
-      if (err) {
-        throw new Error(err);
-      }
-
-      resultList.forEach((processInfo) => {
-        if (processInfo.arguments.includes(`:${port}`)) {
-          logger(`Stopping process with PID ${processInfo.pid}`);
-          process.kill(processInfo.pid, "SIGTERM");
-        }
-      });
-    }
-  );
+function stopAndRestart() {
+  if (nodeProcess) {
+    nodeProcess.kill();
+  }
+  startNodeProcess();
+  logger("Server Restarted");
 }
 
 // Check for Obsidian Engine build

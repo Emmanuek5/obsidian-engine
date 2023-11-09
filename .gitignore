@@ -1,4 +1,6 @@
 node_modules
 data
 dist
+cookies
+obsidian.config.json
 ```
