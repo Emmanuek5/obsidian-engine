@@ -85,12 +85,52 @@ function startNodeProcess() {
   }
 }
 
+<<<<<<< HEAD
 function stopAndRestart() {
   if (nodeProcess) {
     nodeProcess.kill();
   }
   startNodeProcess();
   logger("Server Restarted");
+=======
+const watcher = chokidar.watch(path.join(workingPath, "/pages"), {
+  ignored: /(^|[\/\\])\../,
+  persistent: true,
+});
+
+watcher.on("ready", () => {
+  watcher.on("all", (event, path) => {
+    logger("Clearing /pages/ module cache from server");
+    Object.keys(require.cache).forEach((id) => {
+      if (/[\/\\]pages[\/\\]/.test(id)) delete require.cache[id];
+    });
+    logger(`File changed ${path}`);
+    stopNodeProcessByPort(config.get("port")); // Replace with the desired port to stop
+    // No need to startNodeProcess here; it's automatically restarted in the 'exit' handler
+  });
+});
+
+// Function to stop a process by port
+function stopNodeProcessByPort(port) {
+  ps.lookup(
+    {
+      command: "node",
+      arguments: args,
+    },
+    (err, resultList) => {
+      if (err) {
+        throw new Error(err);
+      }
+
+      resultList.forEach((processInfo) => {
+        if (processInfo.arguments.includes(`:${port}`)) {
+          logger(`Stopping process with PID ${processInfo.pid}`);
+          process.kill(processInfo.pid, "SIGTERM");
+        }
+      });
+    }
+  );
+>>>>>>> f20fb569346945ad6450cf73e94984456a910c6f
 }
 
 // Check for Obsidian Engine build
