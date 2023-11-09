@@ -1,10 +1,6 @@
 {
   "name": "obsidian-runner",
-<<<<<<< HEAD
   "version": "1.0.9",
-=======
-  "version": "1.0.6",
->>>>>>> f20fb569346945ad6450cf73e94984456a910c6f
   "description": "",
   "main": "index.js",
   "bin": "./index.js",

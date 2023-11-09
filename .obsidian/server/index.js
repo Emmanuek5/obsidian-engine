@@ -32,10 +32,7 @@ if (!config.get("db_url") === undefined && config.get("db_url") !== "") {
 if (config.get("auto_update") === true) {
   const { Github } = require("../workers/github");
   const github = new Github(app, config.get("github_webhook_secret"));
-<<<<<<< HEAD
   github.setGlobalPullConfig();
-=======
->>>>>>> f20fb569346945ad6450cf73e94984456a910c6f
 }
 
 const database = new Database(url, portdb, remote);
