@@ -32,8 +32,8 @@ class Github {
 
   setGlobalPullConfig(branch = "main") {
     try {
-      execSync(`git config --global pull.rebase false`);
-      execSync(`git config --global pull.ff only`);
+      execSync(`git config --local pull.rebase false`);
+      execSync(`git config --local pull.ff only`);
       console.log(
         `Global pull configuration set successfully for branch ${branch}`
       );
