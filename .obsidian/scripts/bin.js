@@ -24,19 +24,22 @@ const logger = (message, color = Colors.WHITE_TEXT) => {
   );
 };
 
-console.log = (message, ...args) => {
-  logger(message, ...args);
+const logError = (error) => {
+  console.error(
+    COLORS.RED_TEXT + "[APP ENGINE ERROR] - " + error.toString().trim(),
+    COLORS.RESET
+  );
 };
 
 const runCommand = (command, description) => {
-  console.log(description);
+  logger(description);
   try {
     execSync(command, { stdio: "inherit" });
   } catch (error) {
     console.log(`Failed to run command: ${command}`);
     return false;
   }
-  console.log("Done.");
+  logger("Done.");
   return true;
 };
 
@@ -53,13 +56,13 @@ if (runCommand(gitCheckout, "Downloading Git repository...")) {
     if (runCommand(deleteGitFolder, "Deleting .git folder...")) {
       runCommand(runDev, "Running development script...");
     } else {
-      console.log("Failed to delete .git folder");
+      logError("Failed to delete .git folder");
     }
   } else {
-    console.log("Failed to install dependencies");
+    logError("Failed to install dependencies");
   }
 } else {
-  console.log(
+  logError(
     "Failed to clone repo, Git is not installed or you are not connected to the internet"
   );
 }
