@@ -27,8 +27,10 @@ process_app.on("error", function (error) {
 
 process_app.on("exit", function (code, signal) {
   console.log("App process exited with code: " + code);
+  process.kill(process.pid, "SIGTERM");
 });
 
 process_app.on("close", function (code, signal) {
   console.log("App process closed with code: " + code);
+  process.kill(process.pid, "SIGTERM");
 });
