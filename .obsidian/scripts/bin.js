@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-class COLORS {
+class Colors {
   static GREEN_TEXT = "\x1b[32m";
   static WHITE_TEXT = "\x1b[37m";
   static MAGENTA_TEXT = "\x1b[35m";
@@ -10,21 +10,22 @@ class COLORS {
   static RESET = "\x1b[0m";
 
   static applyColor(message, color) {
-    return color + message + COLORS.RESET;
+    return color + message + Colors.RESET;
   }
 }
 
 const { execSync } = require("child_process");
-const logger = (message, color = COLORS.WHITE_TEXT) => {
+
+const logger = (message, color = Colors.WHITE_TEXT) => {
   console.log(
-    COLORS.GREEN_TEXT + // Change to your preferred color
+    Colors.GREEN_TEXT +
       "[ENGINE INSTALLER] - " +
-      COLORS.applyColor(message, color)
+      Colors.applyColor(message, color)
   );
 };
 
-console.log = (message) => {
-  logger(message);
+console.log = (message, ...args) => {
+  logger(message, ...args);
 };
 
 const runCommand = (command, description) => {
