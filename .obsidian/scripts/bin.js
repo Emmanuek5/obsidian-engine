@@ -1,6 +1,20 @@
 #!/usr/bin/env node
+
+class COLORS {
+  static GREEN_TEXT = "\x1b[32m";
+  static WHITE_TEXT = "\x1b[37m";
+  static MAGENTA_TEXT = "\x1b[35m";
+  static RED_TEXT = "\x1b[31m";
+  static BLUE_TEXT = "\x1b[34m";
+  static YELLOW_TEXT = "\x1b[33m";
+  static RESET = "\x1b[0m";
+
+  static applyColor(message, color) {
+    return color + message + COLORS.RESET;
+  }
+}
+
 const { execSync } = require("child_process");
-const { COLORS } = require("../workers");
 const logger = (message, color = COLORS.WHITE_TEXT) => {
   console.log(
     COLORS.GREEN_TEXT + // Change to your preferred color
