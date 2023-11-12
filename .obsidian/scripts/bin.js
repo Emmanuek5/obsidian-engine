@@ -26,8 +26,8 @@ const logger = (message, color = Colors.WHITE_TEXT) => {
 
 const logError = (error) => {
   console.error(
-    COLORS.RED_TEXT + "[APP ENGINE ERROR] - " + error.toString().trim(),
-    COLORS.RESET
+    Colors.RED_TEXT + "[APP ENGINE ERROR] - " + error.toString().trim(),
+    Colors.RESET
   );
 };
 
