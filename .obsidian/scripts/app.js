@@ -27,7 +27,7 @@ const logError = (error) => {
 
 const preloadFilePath = path.join(workingPath, config.get("electron").preload);
 
-if (fs.existsSync(preloadFilePath)) {
+if (!fs.existsSync(preloadFilePath)) {
   // Create the directory if it doesn't exist in the cache folder
   const preloadCacheFolder = path.join(
     cache_folder,
@@ -43,8 +43,6 @@ if (fs.existsSync(preloadFilePath)) {
   fs.readFileSync(path.join(preloadCacheFolder, "preload.js"), content);
 
   logger("Preload file copied successfully!");
-} else {
-  logError("Preload file not found.");
 }
 
 ncp(assets_folder, path.join(cache_folder, "assets"), (err) => {

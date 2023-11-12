@@ -30,19 +30,10 @@ const logError = (error) => {
   );
 };
 
-function arePackagesInstalled(directory, packageJson) {
-  try {
-    require.resolve(packageJson.name, { paths: [directory] });
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
 function installPackages(directory, packageJson) {
   logger(`Installing required packages in ${directory}...`);
   try {
-    execSync("npm install", { cwd: directory, stdio: "inherit" });
+    execSync("npm install", { cwd: directory, stdio: "ignore" });
     logger("Packages installed successfully!", COLORS.BLUE_TEXT);
   } catch (error) {
     logError("Error installing packages:");
@@ -54,7 +45,7 @@ function installPackages(directory, packageJson) {
 function installPackagesInWorkingPath(packageJson, nodeModulesPath) {
   logger(`Installing required packages in the working path...`);
   try {
-    execSync("npm install", { cwd: nodeModulesPath, stdio: "inherit" });
+    execSync("npm install", { cwd: nodeModulesPath, stdio: "ignore" });
     logger(
       "Packages installed successfully in the working path!",
       COLORS.BLUE_TEXT
