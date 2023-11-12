@@ -47,17 +47,21 @@ const repoName = process.argv[2];
 const gitCheckout = `git clone https://github.com/Emmanuek5/obsidian-engine.git --depth 1  ${repoName}`;
 const installDeps = `cd ${repoName} && npm install`;
 const startServer = `cd ${repoName} && npm start`;
-const deleteGitFolder = `rm -rf ${repoName}/.git`;
+const deleteGitFolder =
+  process.platform === "win32"
+    ? `rmdir /s /q ${repoName}\\.git`
+    : `rm -rf ${repoName}/.git`;
+
 const runDev = `cd ${repoName} && npm run install-dev`;
 
 if (runCommand(gitCheckout, "Downloading Git repository...")) {
   if (runCommand(installDeps, "Installing dependencies...")) {
-    runCommand(startServer, "Starting the server...");
     if (runCommand(deleteGitFolder, "Deleting .git folder...")) {
       runCommand(runDev, "Running development script...");
     } else {
       logError("Failed to delete .git folder");
     }
+    runCommand(startServer, "Starting the server...");
   } else {
     logError("Failed to install dependencies");
   }
