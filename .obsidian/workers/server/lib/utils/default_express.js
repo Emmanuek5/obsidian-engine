@@ -8,7 +8,6 @@ app.set("view engine", "ejs");
 let port = 3000;
 const pagesPath = path.join(process.cwd(), "/views");
 const routesPath = path.join(process.cwd(), "/routes");
-console.log(pagesPath);
 if (fs.existsSync(pagesPath) && fs.lstatSync(pagesPath).isDirectory()) {
   fs.readdirSync(pagesPath).forEach((folder) => {
     const folderPath = path.join(pagesPath, folder);

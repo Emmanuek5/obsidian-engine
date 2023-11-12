@@ -82,7 +82,7 @@ class Build {
 
     console.log(fileName);
 
-    const content = this.renderEngines.htmlRenderer(fileName, {});
+    const content = this.renderEngines.htmlRenderer(fileName, {}, "build");
     fs.writeFileSync(distFilePath, content);
   }
 

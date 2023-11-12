@@ -25,11 +25,10 @@ try {
   let args = ["index.js"];
   let process = spawn("node", args, { cwd: buildPath });
   process.stdout.on("data", (data) => {
-    logger(data.toString());
+    logger(data.toString().trim());
   });
-
   process.stderr.on("data", (data) => {
-    logger(data.toString());
+    logger(data.toString().trim());
   });
 
   process.on("error", function (error) {
