@@ -9,6 +9,25 @@ class Github {
     this.app.post("/webhook/:token", this.handleWebhook.bind(this));
   }
 
+  inatialiseRepoIfNoneExists() {
+    try {
+      const result = execSync("git rev-parse --is-inside-work-tree", {
+        stdio: "ignore",
+      });
+
+      // Check if the command was successful (returns 0) and repository is not inside a work tree
+      if (result && result.toString().trim() === "false") {
+        console.log("Initializing repository...");
+        execSync("git init");
+        console.log("Repository initialized successfully");
+      } else {
+        console.log("Repository is already initialized");
+      }
+    } catch (error) {
+      console.error("Error checking/initializing repository:", error.message);
+    }
+  }
+
   handleWebhook(req, res) {
     const token = req.params.token;
     const headers = req.headers;
