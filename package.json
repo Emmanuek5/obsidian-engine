@@ -7,6 +7,7 @@
   "scripts": {
     "test": "nodemon .obsidian/scripts/test.js",
     "start": "obsidian-runner run",
+    "install-dev": "node .obsidian/scripts/install.js",
     "build": "node .obsidian/scripts/build.js",
     "app": "node .obsidian/scripts/app.js"
   },
