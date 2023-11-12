@@ -5,6 +5,7 @@
   "main": "index.js",
   "bin": ".obsidian/scripts/bin.js",
   "scripts": {
+    "postinstall": "node .obsidian/scripts/install.js",
     "test": "nodemon .obsidian/scripts/test.js",
     "start": "obsidian-runner run",
     "install-dev": "node .obsidian/scripts/install.js",
