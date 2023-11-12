@@ -9,7 +9,8 @@
     "start": "obsidian-runner run",
     "install-dev": "node .obsidian/scripts/install.js",
     "build": "node .obsidian/scripts/build.js",
-    "app": "node .obsidian/scripts/app.js"
+    "app": "node .obsidian/scripts/app.js ",
+    "app:serverless": "node .obsidian/scripts/app.js --no-server"
   },
   "keywords": [
     "render",

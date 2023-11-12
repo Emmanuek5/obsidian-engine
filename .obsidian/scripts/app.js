@@ -10,7 +10,7 @@ const cache_folder = path.join(workingPath, ".obsidian/workers/electron/");
 const cache_dir = fs.readdirSync(cache_folder);
 const assets_folder = path.join(workingPath, "assets");
 const public_folder = path.join(workingPath, "public");
-
+const args = process.argv.slice(2);
 const logger = (message, color = COLORS.BLUE_TEXT) => {
   console.log(
     COLORS.YELLOW_TEXT +
@@ -140,23 +140,30 @@ fs.writeFileSync(
   path.join(electron_path, "package.json"),
   JSON.stringify(electron_workers_package)
 );
+
+let main_process;
 try {
-  let args = ["start"];
+  if (args[0] == "--no-server") {
+    logger("Starting without server...");
+  } else {
+    let argsv = ["start"];
 
-  const main_process = spawn("npm", args, {
-    shell: true,
-    cwd: workingPath,
-  });
+    main_process = spawn("npm", argsv, {
+      shell: true,
+      cwd: workingPath,
+    });
 
-  main_process.stdout.on("data", (data) => {
-    console.log(data.toString().trim());
-  });
-  main_process.stderr.on("data", (data) => {
-    console.log(data.toString().trim());
-  });
+    main_process.stdout.on("data", (data) => {
+      console.log(data.toString().trim());
+    });
+    main_process.stderr.on("data", (data) => {
+      console.log(data.toString().trim());
+    });
+  }
 } catch (e) {
   logError(e);
 }
+
 try {
   let args = ["start"];
   const electron_process = spawn("npm", args, {
@@ -179,6 +186,13 @@ try {
     if (fs.existsSync(file_path)) {
       logger("Electron process exited with code: " + code);
       fs.unlinkSync(file_path);
+      if (main_process) {
+        try {
+          main_process.kill();
+        } catch (error) {
+          logError(error);
+        }
+      }
       process.exit(0);
     }
   });
@@ -187,6 +201,13 @@ try {
     if (fs.existsSync(file_path)) {
       logger("Electron process exited with code: " + code);
       fs.unlinkSync(file_path);
+      if (main_process) {
+        try {
+          main_process.kill();
+        } catch (error) {
+          logError(error);
+        }
+      }
       process.exit(0);
     }
   });
