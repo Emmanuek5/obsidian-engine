@@ -10,7 +10,10 @@
     "install-dev": "node .obsidian/scripts/install.js",
     "build": "node .obsidian/scripts/build.js",
     "app": "node .obsidian/scripts/app.js ",
-    "app:serverless": "node .obsidian/scripts/app.js --no-server"
+    "app:serverless": "node .obsidian/scripts/app.js --no-server",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
   },
   "keywords": [
     "render",
@@ -29,7 +32,6 @@
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
-    "electron": "^27.0.4",
     "express": "^4.18.2",
     "html": "^1.0.0",
     "mongoose": "^7.5.2",
@@ -39,5 +41,13 @@
     "obsidian-runner": "^1.0.9",
     "readme-md-generator": "^1.0.0",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.4.2",
+    "@electron-forge/maker-deb": "^6.4.2",
+    "@electron-forge/maker-rpm": "^6.4.2",
+    "@electron-forge/maker-squirrel": "^6.4.2",
+    "@electron-forge/maker-zip": "^6.4.2",
+    "electron": "^27.0.4"
   }
 }
