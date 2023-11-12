@@ -11,20 +11,25 @@ class Github {
 
   inatialiseRepoIfNoneExists() {
     try {
-      const result = execSync("git rev-parse --is-inside-work-tree", {
-        stdio: "ignore",
-      });
+      // Check if the repository is already initialized
+      execSync("git rev-parse --is-inside-work-tree", { stdio: "ignore" });
 
-      // Check if the command was successful (returns 0) and repository is not inside a work tree
-      if (result && result.toString().trim() === "false") {
-        console.log("Initializing repository...");
-        execSync("git init");
-        console.log("Repository initialized successfully");
-      } else {
-        console.log("Repository is already initialized");
-      }
+      console.log("Repository is already initialized");
     } catch (error) {
-      console.error("Error checking/initializing repository:", error.message);
+      if (error.status === 128) {
+        // The error code 128 indicates that the command failed because it's not inside a Git repository
+        console.log("Initializing repository...");
+
+        try {
+          execSync("git init");
+          console.log("Repository initialized successfully");
+        } catch (initError) {
+          console.error("Error initializing repository:", initError.message);
+        }
+      } else {
+        // Handle other errors
+        console.error("Error checking repository:", error.message);
+      }
     }
   }
 
