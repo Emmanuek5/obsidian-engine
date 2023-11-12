@@ -1,6 +1,6 @@
 {
   "name": "create-obsidian-engine",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A Super fast render engine for simple web developers",
   "main": "index.js",
   "bin": ".obsidian/scripts/bin.js",
