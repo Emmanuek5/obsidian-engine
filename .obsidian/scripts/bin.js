@@ -13,13 +13,15 @@ console.log = (message) => {
   logger(message);
 };
 
-const runCommand = (command) => {
+const runCommand = (command, description) => {
+  console.log(description);
   try {
     execSync(command, { stdio: "inherit" });
   } catch (error) {
     console.log(`Failed to run command: ${command}`);
     return false;
   }
+  console.log("Done.");
   return true;
 };
 
@@ -30,11 +32,11 @@ const startServer = `cd ${repoName} && npm start`;
 const deleteGitFolder = `rm -rf ${repoName}/.git`;
 const runDev = `cd ${repoName} && npm run install-dev`;
 
-if (runCommand(gitCheckout)) {
-  if (runCommand(installDeps)) {
-    runCommand(startServer);
-    if (runCommand(deleteGitFolder)) {
-      runCommand(runDev);
+if (runCommand(gitCheckout, "Downloading Git repository...")) {
+  if (runCommand(installDeps, "Installing dependencies...")) {
+    runCommand(startServer, "Starting the server...");
+    if (runCommand(deleteGitFolder, "Deleting .git folder...")) {
+      runCommand(runDev, "Running development script...");
     } else {
       console.log("Failed to delete .git folder");
     }
