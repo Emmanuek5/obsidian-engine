@@ -1,13 +1,14 @@
 {
   "name": "create-obsidian-engine",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Super fast render engine for simple web developers",
   "main": "index.js",
   "bin": ".obsidian/scripts/bin.js",
   "scripts": {
     "test": "nodemon .obsidian/scripts/test.js",
     "start": "obsidian-runner run",
-    "build": "node .obsidian/scripts/build.js"
+    "build": "node .obsidian/scripts/build.js",
+    "app": "node .obsidian/scripts/app.js"
   },
   "keywords": [
     "render",
@@ -26,10 +27,12 @@
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
+    "electron": "^27.0.4",
     "express": "^4.18.2",
     "html": "^1.0.0",
     "mongoose": "^7.5.2",
     "mysql": "^2.18.1",
+    "ncp": "^2.0.0",
     "nodemon": "^3.0.1",
     "obsidian-runner": "^1.0.9",
     "readme-md-generator": "^1.0.0",
