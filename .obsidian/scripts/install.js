@@ -51,23 +51,6 @@ function installPackages(directory, packageJson) {
   }
 }
 
-function checkAndInstallPackages(directory, packageJson, nodeModulesPath) {
-  if (!arePackagesInstalled(directory, packageJson)) {
-    installPackages(directory, packageJson);
-  } else {
-    logger(`Required packages are already installed in ${directory}.`);
-  }
-}
-
-function arePackagesInstalledInWorkingPath(packageJson, nodeModulesPath) {
-  try {
-    require.resolve(packageJson.name, { paths: [nodeModulesPath] });
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
 function installPackagesInWorkingPath(packageJson, nodeModulesPath) {
   logger(`Installing required packages in the working path...`);
   try {
@@ -83,26 +66,6 @@ function installPackagesInWorkingPath(packageJson, nodeModulesPath) {
   }
 }
 
-function checkAndInstallPackagesInWorkingPath(packageJson, nodeModulesPath) {
-  if (!arePackagesInstalledInWorkingPath(packageJson, nodeModulesPath)) {
-    installPackagesInWorkingPath(packageJson, nodeModulesPath);
-  } else {
-    logger(`Required packages are already installed in the working path.`);
-  }
-}
-
-checkAndInstallPackages(
-  electronDir,
-  JSON.parse(electronPackageJson),
-  electronNodeModules
-);
-checkAndInstallPackages(
-  runnerDir,
-  JSON.parse(runnerPackageJson),
-  runnerNodeModules
-);
-
-checkAndInstallPackagesInWorkingPath(
-  JSON.parse(working_json),
-  workingNodeModules
-);
+installPackagesInWorkingPath(workingPath);
+installPackages(electronDir, electronPackageJson);
+installPackages(runnerDir, runnerPackageJson);
