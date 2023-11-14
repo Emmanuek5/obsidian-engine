@@ -79,7 +79,9 @@ class Electron {
   setUrl(url) {
     this.url = url;
   }
-
+  setTitle(title) {
+    this.mainWindow.setTitle(title);
+  }
   loadFile(file) {
     this.mainWindow.loadFile(file);
   }
