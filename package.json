@@ -9,6 +9,7 @@
     "start": "obsidian-runner run",
     "install-dev": "node .obsidian/scripts/install.js",
     "build": "node .obsidian/scripts/build.js",
+    "serve": "node .obsidian/scripts/serve.js ",
     "app": "node .obsidian/scripts/app.js ",
     "package": "node .obsidian/scripts/app-package.js",
     "app:serverless": "node .obsidian/scripts/app.js --no-server",
