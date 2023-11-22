@@ -70,7 +70,7 @@ class Electron {
   }
 
   setMenu(menu) {
-    Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+    return Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
   }
 
   setIcon(favicon) {
@@ -80,10 +80,10 @@ class Electron {
     this.url = url;
   }
   setTitle(title) {
-    this.mainWindow.setTitle(title);
+    return this.mainWindow.setTitle(title);
   }
   loadFile(file) {
-    this.mainWindow.loadFile(file);
+    return this.mainWindow.loadFile(file);
   }
 
   on(event, callback) {

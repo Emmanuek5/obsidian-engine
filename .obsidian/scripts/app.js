@@ -10,6 +10,7 @@ const cache_folder = path.join(workingPath, ".obsidian/workers/electron/");
 const cache_dir = fs.readdirSync(cache_folder);
 const assets_folder = path.join(workingPath, "assets");
 const public_folder = path.join(workingPath, "public");
+const pages_folder = path.join(workingPath, "pages");
 const args = process.argv.slice(2);
 const logger = (message, color = COLORS.BLUE_TEXT) => {
   console.log(
@@ -58,6 +59,14 @@ ncp(public_folder, path.join(cache_folder, "public"), (err) => {
     logError(`Error copying public folder: ${err}`);
   } else {
     logger("Public folder copied successfully!");
+  }
+});
+
+ncp(pages_folder, path.join(cache_folder, "pages"), (err) => {
+  if (err) {
+    logError(`Error copying pages folder: ${err}`);
+  } else {
+    logger("Pages folder copied successfully!");
   }
 });
 
