@@ -85,6 +85,9 @@ const menu = [
     ],
   },
 ];
-electron.setUrl("http://n1.knight-smp.com:7787/");
+electron.setUrl("http://localhost:" + port);
 electron.setMenu(menu);
 electron.init();
+electron.on("init-window", () => {
+  console.log("Main window initialized");
+});
