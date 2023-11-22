@@ -1,0 +1,1 @@
+ipc.send("init-window");

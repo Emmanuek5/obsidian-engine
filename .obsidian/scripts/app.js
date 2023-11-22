@@ -28,24 +28,6 @@ const logError = (error) => {
 
 const preloadFilePath = path.join(workingPath, config.get("electron").preload);
 
-if (!fs.existsSync(preloadFilePath)) {
-  // Create the directory if it doesn't exist in the cache folder
-  const preloadCacheFolder = path.join(
-    cache_folder,
-    path.dirname(config.get("electron").preload)
-  );
-
-  if (!fs.existsSync(preloadCacheFolder)) {
-    fs.mkdirSync(preloadCacheFolder, { recursive: true });
-  }
-
-  const filedata = fs.readFileSync(preloadFilePath);
-  const content = reStructureImports(filedata.toString());
-  fs.readFileSync(path.join(preloadCacheFolder, "preload.js"), content);
-
-  logger("Preload file copied successfully!");
-}
-
 ncp(assets_folder, path.join(cache_folder, "assets"), (err) => {
   if (err) {
     logError(`Error copying assets: ${err}`);
@@ -119,6 +101,24 @@ modules.forEach((module) => {
   // Add the require statement to the array
   newRequireStatements.push(requireStatement);
 });
+
+if (!fs.existsSync(preloadFilePath)) {
+  // Create the directory if it doesn't exist in the cache folder
+  const preloadCacheFolder = path.join(
+    cache_folder,
+    path.dirname(config.get("electron").preload)
+  );
+
+  if (!fs.existsSync(preloadCacheFolder)) {
+    fs.mkdirSync(preloadCacheFolder, { recursive: true });
+  }
+
+  const filedata = fs.readFileSync(preloadFilePath);
+  const content = reStructureImports(filedata.toString());
+  fs.readFileSync(path.join(preloadCacheFolder, "preload.js"), content);
+
+  logger("Preload file copied successfully!");
+}
 
 let content = `${electron_workers_file}\n${removeImports(
   config_engine.toString()
@@ -245,17 +245,17 @@ function reStructureImports(content) {
   while ((matches = regex.exec(content)) !== null) {
     const importStatement = matches[0];
     const variableName = matches[1];
-    const filePath = matches[2];
+    const moduleName = matches[2];
 
     // Check if the module is a default Node.js package
-    const isDefaultPackage = ["fs", "path", "process"].includes(filePath);
+    const isDefaultPackage = ["fs", "path", "process"].includes(moduleName);
 
     // Use path.join to get the actual file path for non-default packages
-    const actualFilePath = isDefaultPackage
-      ? filePath
-      : path.join(workingPath, filePath);
+    const actualModule = isDefaultPackage
+      ? moduleName
+      : require.resolve(moduleName);
 
-    const newImportStatement = `const ${variableName} = require('${actualFilePath}');`;
+    const newImportStatement = `const ${variableName} = require('${actualModule}');`;
 
     updatedContent = updatedContent.replace(
       importStatement,

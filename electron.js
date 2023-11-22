@@ -7,7 +7,7 @@ const electron = new Electron(
   2000,
   1000,
   port,
-  path.join(__dirname, "./pages/preload.js"),
+  "./pages/preload.js",
   false,
   console.log
 );
@@ -85,6 +85,6 @@ const menu = [
     ],
   },
 ];
-electron.setUrl("http://localhost:" + port);
+electron.setUrl("http://n1.knight-smp.com:7787/");
 electron.setMenu(menu);
 electron.init();

@@ -41,9 +41,9 @@ class Electron {
         width: this.width,
         height: this.height,
         webPreferences: {
-          preload: this.preload,
+          preload: path.join(__dirname, this.preload),
           nodeIntegration: true,
-          contextIsolation: false,
+          contextIsolation: true,
         },
       });
 
@@ -82,10 +82,22 @@ class Electron {
   setTitle(title) {
     return this.mainWindow.setTitle(title);
   }
+  /**
+   * Load a file.
+   *
+   * @param {String} file - The file to be loaded.
+   * @return {type} The result of loading the file.
+   */
   loadFile(file) {
     return this.mainWindow.loadFile(file);
   }
 
+  /**
+   * Registers a callback function for the specified event.
+   *
+   * @param {string} event - The name of the event to listen for.
+   * @param {Function} callback - The callback function to be executed when the event occurs.
+   */
   on(event, callback) {
     ipcMain.on(event, callback);
   }
