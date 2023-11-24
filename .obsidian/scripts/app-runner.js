@@ -1,9 +1,11 @@
 const path = require("path");
 const fs = require("fs");
 const workingDir = path.join(process.cwd(), "resources/app");
+console.log(workingDir);
 const workingDir_package_path = path.join(workingDir, "package.json");
-const { spawn } = require("child_process");
+const { spawn, execSync } = require("child_process");
 const { COLORS } = require("obsidian-runner/colours");
+const { exit } = require("process");
 const workingDir_package = JSON.parse(
   fs.readFileSync(workingDir_package_path, "utf8")
 );
@@ -33,4 +35,5 @@ process_app.on("exit", function (code, signal) {
 process_app.on("close", function (code, signal) {
   console.log("App process closed with code: " + code);
   process.kill(process.pid, "SIGTERM");
+  exit(0);
 });

@@ -25,6 +25,7 @@ class Electron {
     this.width = width;
     this.height = height;
     this.port = port;
+    this.title = "";
     this.preload = preload;
     this.dev = dev;
     this.url = "";
@@ -54,6 +55,10 @@ class Electron {
         this.mainWindow.loadURL(this.url);
       }
 
+      if (this.title) {
+        this.mainWindow.setTitle(this.title);
+      }
+
       app.on("window-all-closed", () => {
         if (process.platform !== "darwin") {
           app.quit();
@@ -80,7 +85,7 @@ class Electron {
     this.url = url;
   }
   setTitle(title) {
-    return this.mainWindow.setTitle(title);
+    this.title = title;
   }
   /**
    * Load a file.
