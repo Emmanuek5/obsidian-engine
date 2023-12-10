@@ -587,6 +587,20 @@ class Table extends EventEmitter {
     const schemaKeys = Object.keys(this.schema);
     const rowKeys = Object.keys(row);
 
+    //crosscheck schema and row keys let itc heck if the key has a default value
+    schemaKeys.forEach((key) => {
+      if (
+        this.schema[key].required &&
+        !rowKeys.includes(key) &&
+        row[key] === undefined &&
+        this.schema[key].default === undefined
+      ) {
+        console.error(
+          `Column '${key}' is required but not provided in the inserted row.`
+        );
+        return false;
+      }
+    });
     for (const key in this.schema) {
       // Check if the key is required and not provided (unless it has a default)
       if (
@@ -641,7 +655,7 @@ class Table extends EventEmitter {
     this.data.push(row);
     this.addId();
     this.emit("save");
-    return this;
+    return row;
     // Emit the 'save' event after inserting a row
   }
 
@@ -654,6 +668,8 @@ class Table extends EventEmitter {
   }
 
   selectAll() {
+    const data = Object.values(this.data);
+    return data;
     return this.data;
   }
 
@@ -676,7 +692,11 @@ class Table extends EventEmitter {
       Object.keys(query).length === 0 ||
       query == {}
     ) {
-      return this.data;
+      const detached_data = [];
+      for (const row of this.data) {
+        detached_data.push({ ...row });
+      }
+      return [...detached_data]; // Return a shallow copy of the data array
     }
     const results = [];
     for (const row of this.data) {
@@ -688,10 +708,10 @@ class Table extends EventEmitter {
         }
       }
       if (match) {
-        results.push(row); // Stringify the row before pushing it
+        results.push({ ...row }); // Create a new object for each row
       }
     }
-    return results;
+    return results; // Return the results array with new objects
   }
 
   /**
@@ -736,6 +756,7 @@ class Table extends EventEmitter {
   }
 
   save() {
+    this.emit("save");
     return true;
   }
   /**

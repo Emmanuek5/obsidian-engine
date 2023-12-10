@@ -454,22 +454,31 @@ class RenderEngines {
     if (fs.existsSync(optionsFilePath)) {
       const optionsFile = fs.readFileSync(optionsFilePath, "utf8");
       const optionsJson = JSON.parse(optionsFile);
-      options = Object.assign(options, optionsJson);
-      options.render_options.authenticated = options.authenticated;
-      const layoutFile = path.join(
-        this.layoutPath,
-        optionsJson.layout + ".html"
-      );
-      let layoutContent = fs.readFileSync(layoutFile, "utf8");
-
-      // Replace <<$content>> in the layout with the actual content
-      layoutContent = layoutContent.replace(/<<\$content>>/g, content);
-      for (const key in options.render_options) {
-        const variable = options[key];
-        const pattern = new RegExp(`<<\\$${key}>>`, "g");
-        layoutContent = layoutContent.replace(pattern, variable);
+      let layoutContent = "";
+      if (
+        optionsJson.layout &&
+        optionsJson.layout !== "default" &&
+        optionsJson.layout !== ""
+      ) {
+        options = Object.assign(options, optionsJson);
+        options.render_options.authenticated = options.authenticated;
+        const layoutFile = path.join(
+          this.layoutPath,
+          optionsJson.layout + ".html"
+        );
+        layoutContent = fs.readFileSync(layoutFile, "utf8");
+        // Replace <<$content>> in the layout with the actual content
+        layoutContent = layoutContent.replace(/<<\$content>>/g, content);
+        for (const key in options.render_options) {
+          const variable = options[key];
+          const pattern = new RegExp(`<<\\$${key}>>`, "g");
+          layoutContent = layoutContent.replace(pattern, variable);
+        }
+        layoutContent = this.addDefaultCSStToContent(layoutContent);
+        layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
+      } else {
+        layoutContent = content;
       }
-
       if (options.meta && typeof options.meta === "object") {
         const customMetaTags = [];
 
@@ -542,25 +551,36 @@ class RenderEngines {
           }
         }
       }
-
       // Return the layout content with included scripts and styles
       return layoutContent;
     } else if (fs.existsSync(defaultOptionsFilePath)) {
       const optionsFile = fs.readFileSync(defaultOptionsFilePath, "utf8");
       const optionsJson = JSON.parse(optionsFile);
-      options = Object.assign(options, optionsJson);
-      options.render_options.authenticated = options.authenticated;
-      const layoutFile = path.join(
-        this.layoutPath,
-        optionsJson.layout + ".html"
-      );
-      let layoutContent = fs.readFileSync(layoutFile, "utf8");
-      // Replace <<$content>> in the layout with the actual content
-      layoutContent = layoutContent.replace(/<<\$content>>/g, content);
-      for (const key in options.render_options) {
-        const variable = options[key];
-        const pattern = new RegExp(`<<\\$${key}>>`, "g");
-        layoutContent = layoutContent.replace(pattern, variable);
+
+      let layoutContent = "";
+      if (
+        optionsJson.layout &&
+        optionsJson.layout !== "default" &&
+        optionsJson.layout !== ""
+      ) {
+        options = Object.assign(options, optionsJson);
+        options.render_options.authenticated = options.authenticated;
+        const layoutFile = path.join(
+          this.layoutPath,
+          optionsJson.layout + ".html"
+        );
+        layoutContent = fs.readFileSync(layoutFile, "utf8");
+        // Replace <<$content>> in the layout with the actual content
+        layoutContent = layoutContent.replace(/<<\$content>>/g, content);
+        for (const key in options.render_options) {
+          const variable = options[key];
+          const pattern = new RegExp(`<<\\$${key}>>`, "g");
+          layoutContent = layoutContent.replace(pattern, variable);
+        }
+        layoutContent = this.addDefaultCSStToContent(layoutContent);
+        layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
+      } else {
+        layoutContent = content;
       }
 
       if (options.meta && typeof options.meta === "object") {
@@ -642,6 +662,33 @@ class RenderEngines {
     } else {
       return content;
     }
+  }
+
+  addDefaultJavaScriptToContent(content) {
+    // Create a regular expression to find the </head> tag in a case-insensitive manner
+    const headTagRegex = /<\/head>/i;
+    const scripts = ["/server/defaults.js", "/server/bundler.js"];
+    const scriptTags = scripts.map((script) => {
+      return `<script src="${script}"></script>`;
+    });
+
+    // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;
+    return content.replace(headTagRegex, `${scriptTags.join("\n")}\n</head>`);
+  }
+
+  addDefaultCSStToContent(content) {
+    // Create a regular expression to find the </head> tag in a case-insensitive manner
+    const headTagRegex = /<\/head>/i;
+    const defaultServerPath = path.join(process.cwd(), ".obsidian", "server");
+    const styles = ["/resources/defaults.css"];
+    const data = fs.readFileSync(
+      path.join(defaultServerPath, "resources", "defaults.css"),
+      "utf8"
+    );
+
+    const styleTag = `<style>${data}</style>`;
+    content = content.replace(headTagRegex, `${styleTag}\n$&`); // Use $& to include the matched </head> tag
+    return content; // Return the modified content
   }
 
   isFaviconinContent(content) {
