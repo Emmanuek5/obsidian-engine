@@ -22,17 +22,32 @@ class Response {
     this.viewEngine = "html";
     this.body = "";
   }
-
-  compress() {
+  async compress() {
     const acceptEncoding = this.req_headers["accept-encoding"];
 
     if (!acceptEncoding || !acceptEncoding.includes("gzip")) {
       return this.body;
     }
 
-    this.setHeader("Content-Encoding", "gzip");
-    this.body = zlib.gzipSync(this.body);
-    return this.body;
+    try {
+      const compressedBody = await new Promise((resolve, reject) => {
+        zlib.gzip(
+          this.body,
+          { level: zlib.constants.Z_BEST_COMPRESSION },
+          (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+          }
+        );
+      });
+
+      this.setHeader("Content-Encoding", "gzip");
+      this.body = compressedBody;
+      return this.body;
+    } catch (error) {
+      console.error("Compression error:", error);
+      return this.body; // Return uncompressed body in case of an error
+    }
   }
 
   setStatus(statusCode) {
@@ -102,10 +117,10 @@ class Response {
     return this;
   }
 
-  file(filePath) {
+  async file(filePath) {
     if (fs.existsSync(filePath)) {
       this.body = fs.readFileSync(filePath);
-      this.body = this.compress();
+      this.body = await this.compress();
       this.setHeader("Content-Type", "application/octet-stream");
       this.response.writeHead(this.statusCode, this.headers);
       this.response.end(this.body);
