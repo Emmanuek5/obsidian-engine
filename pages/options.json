@@ -3,7 +3,7 @@
   "scripts": ["home.js"],
   "styles": ["home.css"],
   "render_options": {
-    "title": "Home",
+    "title": "Obsidian Engine Docs",
     "name": "Obsidian Engine"
   },
   "meta": {

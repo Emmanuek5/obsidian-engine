@@ -1,7 +1,7 @@
 const url = require("url");
 const querystring = require("querystring");
 const fs = require("fs");
-
+const { formidable } = require("formidable");
 class Request {
   constructor(httpRequest) {
     this.method = httpRequest.method;
@@ -14,15 +14,17 @@ class Request {
     this.cookies = {};
     this.session = {};
     this.user = null;
+    this.file = this.files[0];
     this.ip = httpRequest.socket ? httpRequest.socket.remoteAddress : null;
 
-    // Listen for data events to collect request body
-    httpRequest.on("data", (chunk) => {
-      this.body += chunk.toString();
+    this.parseCookies();
+  }
+
+  chunkBody() {
+    this.httpRequest.on("data", (chunk) => {
+      this.body += chunk;
       this.parseBody();
     });
-
-    this.parseCookies();
   }
 
   getBody() {
@@ -33,9 +35,7 @@ class Request {
     const contentType = this.headers["content-type"];
 
     if (contentType && contentType.includes("application/json")) {
-      this.body = this.getBodyAsJSON();
-    } else if (contentType && contentType.includes("multipart/form-data")) {
-      this.parseFormData();
+      this.body = this.toJSON();
     } else if (
       contentType &&
       contentType.includes("application/x-www-form-urlencoded")
@@ -69,99 +69,55 @@ class Request {
   // ...
 
   async parseFormData() {
+    const form = formidable({ multiples: true });
+
     return new Promise((resolve, reject) => {
-      const boundary = this.headers["content-type"].split("=")[1];
-      const parts = this.body.split(`--${boundary}`);
-
-      const formData = {};
-      const files = {};
-
-      // Iterate through parts, excluding the last (empty) part
-      for (let i = 1; i < parts.length - 1; i++) {
-        const part = parts[i];
-
-        if (
-          !part.includes("filename") &&
-          !part.includes("Content-Disposition")
-        ) {
-          // Skip if it's not a valid part
-          continue;
-        }
-
-        // Check if it's a field or a file
-        if (part.includes("filename")) {
-          const file = {};
-          const lines = part.split("\r\n");
-
-          // Extract file details
-          const fileDetails = lines[0] + lines[1];
-          const fileNameMatch = fileDetails.match(/filename="(.*)"/);
-          const fileName = fileNameMatch ? fileNameMatch[1] : undefined;
-
-          if (!fileName) {
-            console.log("no filename");
-            // Skip if filename is not found
-            continue;
-          }
-
-          const fileRequestNameMatch = fileDetails.match(/name="(.*?)"/);
-          const fileRequestName = fileRequestNameMatch
-            ? fileRequestNameMatch[1]
-            : undefined;
-
-          const fileTypeMatch = fileDetails.match(/Content-Type: (.*)/);
-          const fileType = fileTypeMatch ? fileTypeMatch[1] : undefined;
-          file.name = fileName;
-          file.type = fileType;
-
-          // Remove the content type and disposition
-          const fileDataLines = part
-            .replace(/Content-Disposition:.*\r\n/, "")
-            .replace(/Content-Type:.*\r\n/, "");
-
-          // Parse to different buffer types based on file type
-          if (fileType === "image/png") {
-            file.data = Buffer.from(fileDataLines, "base64");
-          } else {
-            file.data = Buffer.from(fileDataLines);
-          }
-
-          // Add the mv function to the file object
-          file.mv = (destinationPath, callback) => {
-            // Use fs.writeFileSync to save the file to the specified destination path without encoding
-            fs.writeFileSync(destinationPath, file.data, (err) => {
-              if (err) {
-                callback(err);
-              } else {
-                callback(null);
-              }
-            });
-          };
-
-          // Add file to files object
-          files[fileRequestName] = file;
+      form.parse(this.httpRequest, (err, fields, files) => {
+        if (err) {
+          reject(err);
         } else {
-          // It's a regular form field
-          const [header, value] = part.split("\r\n\r\n");
-          const fieldNameMatch = header.match(/name="(.*)"/);
-          const fieldName = fieldNameMatch ? fieldNameMatch[1] : undefined;
+          this.body = {};
+          this.files = {};
 
-          if (!fieldName) {
-            // Skip if field name is not found
-            continue;
-          }
+          Object.keys(files).forEach((fieldName) => {
+            const fieldFiles = files[fieldName];
+            const firstFile = fieldFiles[0];
 
-          formData[fieldName] = value;
+            this.files[fieldName] = {
+              name: firstFile.originalFilename,
+              temp: firstFile.filepath,
+              type: firstFile.mimetype,
+              size: firstFile.size,
+              mv: (path, callback) => {
+                fs.copyFile(firstFile.filepath, path, (err) => {
+                  if (err) {
+                    callback(err);
+                  } else {
+                    callback();
+                  }
+                });
+              },
+              // Add other properties as needed
+            };
+          });
+
+          Object.keys(fields).forEach((fieldName) => {
+            if (Array.isArray(fields[fieldName])) {
+              // If it's an array, use the first item
+              this.body[fieldName] = fields[fieldName][0];
+            } else {
+              // If it's not an array, use it directly
+              this.body[fieldName] = fields[fieldName];
+            }
+          });
+
+          // Use the dynamic field name for files
+          const dynamicFieldName = Object.keys(this.files)[0];
+          this.file = this.files[dynamicFieldName];
+
+          resolve();
         }
-      }
-
-      // Assign parsed form data and files to the respective properties
-      this.body = formData;
-      this.files = files;
-      console.log(this.body);
-      console.log(this.files);
-      resolve();
-      return { formData, files };
+      });
     });
   }
 
@@ -185,12 +141,10 @@ class Request {
     return files;
   }
 
-  getBodyAsJSON() {
+  toJSON() {
     try {
       return JSON.parse(this.body);
-    } catch (error) {
-      return null;
-    }
+    } catch (error) {}
   }
 }
 

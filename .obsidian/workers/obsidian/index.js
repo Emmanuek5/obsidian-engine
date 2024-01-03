@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+process.on("unhandledRejection", (err) => {
+  console.error(err);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error(err);
+});
 
 const { spawn } = require("child_process");
 const chokidar = require("chokidar");
@@ -64,6 +71,19 @@ function startNodeProcess() {
     });
 
     nodeProcess.stderr.on("data", (error) => {
+      console.error(
+        COLORS.RED_TEXT + "[ENGINE ERROR] - " + error.toString().trim(),
+        COLORS.RESET
+      );
+    });
+    nodeProcess.on("uncaughtException", function (error) {
+      console.error(
+        COLORS.RED_TEXT + "[ENGINE ERROR] - " + error.toString().trim(),
+        COLORS.RESET
+      );
+    });
+
+    nodeProcess.on("error", function (error) {
       console.error(
         COLORS.RED_TEXT + "[ENGINE ERROR] - " + error.toString().trim(),
         COLORS.RESET

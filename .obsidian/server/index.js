@@ -1,8 +1,19 @@
 const { server, Config, Router, Table } = require("../../modules");
-const app = server();
+const path = require("path");
 const config = new Config();
 const port = config.get("port");
-const path = require("path");
+let options = {};
+const cert_options = config.get("secure_certs");
+require("dotenv").config({ path: path.join(process.cwd(), ".env") });
+
+if (cert_options.enabled) {
+  options = {
+    cert: path.join(__dirname, cert_options.cert_path),
+    key: path.join(__dirname, cert_options.key_path),
+  };
+}
+const app = server(options);
+
 const fs = require("fs");
 const { Database } = require("../workers/database");
 const defaultPath = process.cwd();
@@ -10,7 +21,8 @@ const pagesPath = path.join(defaultPath, "pages");
 const routesPath = path.join(defaultPath, "routes");
 const tablesPath = path.join(defaultPath, "models");
 const { spawn } = require("child_process");
-
+const ObsidianError = require("../classes/ObsidianError");
+const requestCount = new Map();
 let portdb = null;
 let url = null;
 let remote = false;
@@ -29,6 +41,40 @@ if (!config.get("db_url") === undefined && config.get("db_url") !== "") {
 } else {
   url = "database";
 }
+
+const rate_config = config.get("rate_limits");
+
+if (rate_config.enabled) {
+  if (!rate_config.duration) {
+    rate_config.duration = 60;
+  }
+  if (!rate_config.max) {
+    rate_config.max = 100;
+  }
+}
+
+app.server.on("request", (req, res) => {
+  const ipAddress = req.ip;
+
+  // Initialize request count for the IP address
+  if (!requestCount.has(ipAddress)) {
+    requestCount.set(ipAddress, 1);
+
+    // Set a timer to reset the count after the duration
+    setTimeout(() => {
+      requestCount.delete(ipAddress);
+    }, rate_config.duration * 1000);
+  } else {
+    // Increment the request count
+    requestCount.set(ipAddress, requestCount.get(ipAddress) + 1);
+    // Check if the request count exceeds the maximum allowed
+    if (requestCount.get(ipAddress) > rate_config.max) {
+      res.setHeader("Retry-After", rate_config.duration);
+      res.status(429).send("Too many requests");
+      return;
+    }
+  }
+});
 
 if (config.get("auto_update") === true) {
   const { Github } = require("../workers/github");
@@ -54,25 +100,6 @@ if (fs.existsSync(tablesPath) && fs.lstatSync(tablesPath).isDirectory()) {
       }
     }
   });
-}
-
-if (fs.existsSync(routesPath) && fs.lstatSync(routesPath).isDirectory()) {
-  fs.readdirSync(routesPath).forEach((file) => {
-    if (file.endsWith(".js")) {
-      const router = require(path.join(routesPath, file));
-      if (router instanceof Router) {
-        let basePath = router.basePath;
-        if (!basePath.startsWith("/")) {
-          basePath = `/${basePath}`;
-        }
-        app.use("/api" + basePath, path.join(routesPath, file));
-      } else {
-        throw new Error("The router file must export a Router instance");
-      }
-    }
-  });
-} else {
-  console.log("No api folder found");
 }
 
 if (fs.existsSync(pagesPath) && fs.lstatSync(pagesPath).isDirectory()) {
@@ -123,6 +150,10 @@ function registerRoute(route, folder, fileName) {
     // You can customize this part based on your rendering logic
     const params = req.params;
     params.authenticated = req.session.user ? true : false;
+    //Let's add the current page to the params
+    //let it check if the current page is the index of a folder or not
+    params.current_page = fileName === "index" ? folder : fileName;
+
     path.join(process.cwd(), `/pages/${folder}/${fileName}`);
     const filename = path.basename(`${folder}/${fileName}`);
     res.render(`${folder}/${filename}`, params);
@@ -139,7 +170,47 @@ app.get("/favicon.ico", (req, res) => {
   }
 });
 
-app.use("/assets", path.join(process.cwd(), "/assets"));
+const asset_dirs = config.get("asset_dirs");
+
+if (asset_dirs) {
+  for (const asset_dir of asset_dirs) {
+    let dir = path.join(process.cwd(), asset_dir.path) || "";
+    let httpPath = asset_dir.url || "";
+    if (!fs.existsSync(dir) || !fs.lstatSync(dir).isDirectory()) {
+      throw new ObsidianError("Directory does not exist: " + dir);
+    }
+    app.dir(path.join(process.cwd(), asset_dir.path), httpPath);
+  }
+}
+
+const workers = config.get("workers");
+
+if (workers) {
+  for (const worker of workers) {
+    let routesPath = path.join(process.cwd(), worker.path) || "";
+    let baseUrl = worker.baseurl || "";
+    if (!fs.existsSync(routesPath) || !fs.lstatSync(routesPath).isDirectory()) {
+      throw new Error("Directory does not exist: " + routesPath);
+    }
+    if (worker.enabled) {
+      fs.readdirSync(routesPath).forEach((file) => {
+        if (file.endsWith(".js")) {
+          const router = require(path.join(routesPath, file));
+          if (router instanceof Router) {
+            let basePath = router.basePath;
+            if (!basePath.startsWith("/")) {
+              basePath = `/${basePath}`;
+            }
+            app.use(baseUrl + basePath, path.join(routesPath, file));
+          } else {
+            throw new Error("The router file must export a Router instance");
+          }
+        }
+      });
+    }
+  }
+}
+
 app.use("/public", path.join(process.cwd(), "/public"));
 app.use("/scripts", path.join(process.cwd(), "/public/js"));
 app.use("/styles", path.join(process.cwd(), "/public/css"));

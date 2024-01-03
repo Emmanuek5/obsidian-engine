@@ -8,6 +8,7 @@ class Response {
     this.response = httpResponse;
     this.req_headers = {};
     this.statusCode = 200; // Default status code is 200 OK
+    this.limi;
     this.headers = {
       "Content-Type": "text/html",
       Engine: "Obsidian Engine",
@@ -29,25 +30,9 @@ class Response {
       return this.body;
     }
 
-    try {
-      const compressedBody = await new Promise((resolve, reject) => {
-        zlib.gzip(
-          this.body,
-          { level: zlib.constants.Z_BEST_COMPRESSION },
-          (err, result) => {
-            if (err) reject(err);
-            else resolve(result);
-          }
-        );
-      });
-
-      this.setHeader("Content-Encoding", "gzip");
-      this.body = compressedBody;
-      return this.body;
-    } catch (error) {
-      console.error("Compression error:", error);
-      return this.body; // Return uncompressed body in case of an error
-    }
+    this.setHeader("Content-Encoding", "gzip");
+    this.body = zlib.gzipSync(this.body);
+    return this.body;
   }
 
   setStatus(statusCode) {
@@ -117,10 +102,10 @@ class Response {
     return this;
   }
 
-  async file(filePath) {
+  file(filePath) {
     if (fs.existsSync(filePath)) {
       this.body = fs.readFileSync(filePath);
-      this.body = await this.compress();
+      this.compress();
       this.setHeader("Content-Type", "application/octet-stream");
       this.response.writeHead(this.statusCode, this.headers);
       this.response.end(this.body);
@@ -165,6 +150,7 @@ class Response {
 
   end() {
     this.response.end();
+
     return this;
   }
 }

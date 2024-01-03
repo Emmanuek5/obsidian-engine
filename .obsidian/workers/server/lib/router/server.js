@@ -1,4 +1,5 @@
 const http = require("http");
+const https = require("https");
 const { Request } = require("./request");
 const { Response } = require("./response");
 const event = require("events");
@@ -11,17 +12,37 @@ const COOKIES_DIR = path.join(process.cwd(), ".obsidian/cookies");
 const uuid = require("uuid");
 const sessions = [];
 const zlib = require("zlib"); //
+const url = require("url");
+const ObsidianError = require("../../../../classes/ObsidianError");
+
 class Server extends event.EventEmitter {
-  constructor(viewEngine) {
+  constructor(viewEngine, options = {}) {
     super();
+
+    // Create an HTTP server
     this.server = http.createServer(this.handleRequest.bind(this));
+
+    // Check if certificate and key options are provided for HTTPS
+    if (options.cert && options.key) {
+      // Create an HTTPS server with certificate and key to listen on port 443
+      this.httpsServer = https.createServer(
+        {
+          cert: fs.readFileSync(options.cert),
+          key: fs.readFileSync(options.key),
+        },
+        this.handleRequest.bind(this)
+      );
+      this.httpsServer.listen(443);
+    } else {
+    }
+
     this.routes = {};
     this.on = eventEmitter.on;
     this.emit = eventEmitter.emit;
     this.viewEngine = viewEngine;
 
     if (!fs.existsSync(COOKIES_DIR)) {
-      fs.mkdirSync(COOKIES_DIR);
+      fs.mkdirSync(COOKIES_DIR, { recursive: true });
     }
   }
 
@@ -31,6 +52,14 @@ class Server extends event.EventEmitter {
 
     response.viewEngine = this.viewEngine;
     response.req_headers = request.headers;
+
+    if (
+      req.headers["content-type"] &&
+      req.headers["content-type"].includes("multipart/form-data")
+    ) {
+    } else {
+      request.chunkBody();
+    }
 
     // Record the start time when the request is received
     const startTime = new Date();
@@ -132,7 +161,7 @@ class Server extends event.EventEmitter {
       const contentType = request.headers["content-type"];
       if (contentType && contentType.includes("application/json")) {
         // Parse JSON body
-        request.getBodyAsJSON();
+        request.toJSON();
         resolve();
       } else if (contentType && contentType.includes("multipart/form-data")) {
         // Parse multipart/form-data
@@ -178,16 +207,26 @@ class Server extends event.EventEmitter {
       // Calculate the time taken to process the request in milliseconds
       const endTime = new Date();
       const elapsedTime = endTime - startTime;
-      // Log the request with method, path, status code, and milliseconds
+      const ip = request.ip
+        .replace("::ffff:", "")
+        .split(".")
+        .map((segment, index) => (index === 0 || index >= 3 ? segment : "xxx"))
+        .join(".");
       console.log(
-        `${request.method} ${request.path} ${response.statusCode} ${elapsedTime}ms`
+        ` ${ip} ${request.method} ${request.path} ${response.statusCode}  ${elapsedTime}ms`
       );
     } else {
       const endTime = new Date();
       const elapsedTime = endTime - startTime;
+      const ip = request.ip
+        .replace("::ffff:", "")
+        .split(".")
+        .map((segment, index) => (index === 0 || index >= 3 ? segment : "xxx"))
+        .join(".");
+
       response.setStatus(404).send("Not Found");
       console.log(
-        `${request.method} ${request.path} ${response.statusCode} ${elapsedTime}ms`
+        ` ${ip}  ${request.method}  ${request.path}  ${response.statusCode}  ${elapsedTime}ms`
       );
     }
   }
@@ -358,10 +397,28 @@ class Server extends event.EventEmitter {
       return dynamicRouteHandler;
     }
 
+    // Try to find an open-ended URL handler
+    const openEndedUrlHandler = this.findOpenEndedUrlHandler(path, method);
+    if (openEndedUrlHandler) {
+      return openEndedUrlHandler;
+    }
+
     return null;
   }
 
   // ...
+  findOpenEndedUrlHandler(path, method) {
+    for (const routePath in this.routes) {
+      if (routePath.endsWith("/*") && path.startsWith(routePath.slice(0, -2))) {
+        const routeHandlers = this.routes[routePath];
+        if (routeHandlers && routeHandlers[method]) {
+          return routeHandlers[method];
+        }
+      }
+    }
+
+    return null;
+  }
 
   /**
    * Find the route handler for dynamic routes.
@@ -407,11 +464,16 @@ class Server extends event.EventEmitter {
 
           if (isMatch) {
             // Found a match for dynamic route parameters
-            return (req, res) => {
-              // Pass the parameters to the handler
-              req.params = params;
-              this.routes[routePath][method](req, res);
-            };
+
+            if (this.routes[routePath][method]) {
+              return (req, res) => {
+                // Pass the parameters to the handler
+                req.params = params;
+                this.routes[routePath][method](req, res);
+              };
+            } else {
+              return null;
+            }
           }
         }
       }
@@ -424,32 +486,25 @@ class Server extends event.EventEmitter {
   }
   dir(dirPath, httpPath) {
     if (!fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) {
-      throw new Error("Directory does not exist: " + dirPath);
+      throw new ObsidianError("Directory does not exist: " + dirPath);
     }
 
-    // Serve directory listing when the basePath is accessed
-    this.addRoute(httpPath, "GET", (req, res) => {
-      const files = fs.readdirSync(dirPath);
+    this.addRoute(httpPath + "/*", "GET", (req, res) => {
+      let urlPath = req.path;
 
-      let html = "<ul>";
-      files.forEach((fileName) => {
-        const filePath = path.join(dirPath, fileName);
-        const routePath = path.join(httpPath, fileName);
-        const isDirectory = fs.statSync(filePath).isDirectory();
-        const linkText = isDirectory ? fileName + "/" : fileName;
-        html += `<li><a href="${routePath}">${linkText}</a></li>`;
-      });
-      html += "</ul>";
-      res.send(html);
-    });
+      // Remove the httpPath from the urlPath
+      urlPath = urlPath.replace(httpPath, "");
 
-    // Serve files within the directory
-    fs.readdirSync(dirPath).forEach((fileName) => {
-      const filePath = path.join(dirPath, fileName); // Use path.join for file paths
-      const routePath = path.join(httpPath, fileName).replace(/\\/g, "/"); // Replace backslashes with forward slashes
-      this.addRoute(routePath, "GET", (req, res) => {
+      // Decode URL-encoded characters
+      urlPath = decodeURIComponent(urlPath);
+
+      const filePath = path.join(dirPath, urlPath);
+
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
         res.file(filePath);
-      });
+      } else {
+        res.send("404 File not found").status(404);
+      }
     });
   }
 

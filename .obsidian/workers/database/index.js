@@ -711,6 +711,7 @@ class Table extends EventEmitter {
         results.push({ ...row }); // Create a new object for each row
       }
     }
+    results.reverse(); // Reverse the results array to preserve the original order
     return results; // Return the results array with new objects
   }
 
@@ -768,17 +769,21 @@ class Table extends EventEmitter {
    */
   findAndUpdate(query, update) {
     const results = this.find(query);
+
     if (results.length > 0) {
-      for (const row of results) {
-        for (const key in update) {
-          row[key] = update[key];
+      //locate the data in the main array and update it
+      for (let data of this.data) {
+        if (data.id === results[0].id) {
+          for (const key in update) {
+            data[key] = update[key];
+          }
         }
       }
+      this.emit("save");
       return true;
     } else {
       return false;
     }
-    // Emit the 'save' event after updating a row
   }
 
   /**
@@ -791,9 +796,13 @@ class Table extends EventEmitter {
   findOneAndUpdate(query, update) {
     const results = this.find(query);
     if (results.length > 0) {
-      const updatedRow = results[0];
-      for (const key in update) {
-        updatedRow[key] = update[key];
+      //locate the data in the main array and update it
+      for (let data of this.data) {
+        if (data.id === results[0].id) {
+          for (const key in update) {
+            data[key] = update[key];
+          }
+        }
       }
       this.emit("save");
       return true;
@@ -822,11 +831,30 @@ class Table extends EventEmitter {
     // Emit the 'save' event after deleting a row
   }
 
-  findAndDeleteOne(query) {
+  findOneAndDelete(query) {
     const results = this.find(query);
     if (results.length > 0) {
       const row = results[0];
       this.data.splice(this.data.indexOf(row), 1);
+      return true;
+    } else {
+      return false;
+    }
+    // Emit the 'save' event after deleting a row
+  }
+
+  /**
+   * Deletes rows from the data array that match the given query.
+   *
+   * @param {Object} query - The query object used to filter the rows.
+   * @return {boolean} Returns true if any rows were deleted, false otherwise.
+   */
+  delete(query) {
+    const results = this.find(query);
+    if (results.length > 0) {
+      for (const row of results) {
+        this.data.splice(this.data.indexOf(row), 1);
+      }
       return true;
     } else {
       return false;

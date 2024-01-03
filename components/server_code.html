@@ -1,8 +1,8 @@
 <div class="example_code server_code hidden" id="server_code">
-    <div class="code_block" id="routes_define">
-        <h4>To Add a new route to the /api base route (e.g /api/open etc)</h4>
-        <p>Example</p>
-        <pre>
+  <div class="code_block" id="routes_define">
+    <h4>To Add a new route to the /api base route (e.g /api/open etc)</h4>
+    <p>Example</p>
+    <pre>
             const { Router } = require("../modules");
             const router = new Router();
 
@@ -15,15 +15,16 @@
 
 
             module.exports = router;
-        </pre>
-        <p>To define a route place the file in the /api folder </p>
-        <p>The router.basePath defines the main path of the router file</p>
-        <p>The router.get defines the method and the path of the route</p>
-    </div>
-    <div class="code_block" id="database">
-        <h4>To use the database use the database module</h4>
-        <p>Example:</p>
-        <pre>
+        </pre
+    >
+    <p>To define a route place the file in the /api folder</p>
+    <p>The router.basePath defines the main path of the router file</p>
+    <p>The router.get defines the method and the path of the route</p>
+  </div>
+  <div class="code_block" id="database">
+    <h4>To use the database use the database module</h4>
+    <p>Example:</p>
+    <pre>
            const { Table } = require("../modules");
         const table = new Table();
          table.name = "users";
@@ -46,9 +47,10 @@ table.setSchema({
 
 
 module.exports = table;
-        </pre>
-        <p>To define a table go to the /models folder </p>
-        <pre>
+        </pre
+    >
+    <p>To define a table go to the /models folder</p>
+    <pre>
             const usersModel = require("../models/users");
 
 
@@ -56,38 +58,81 @@ usersModel.find({}).then((users) => {
   console.log(users);
 });
 
-        </pre>
-        <p>To use the table u call the file and all the functionality will come with it  </p>
-    </div>
-    <div class="code_block" id="database_connect">
-        <h4>Using the database outside the engine</h4>
-        <p>To use the database outside the engine we have made a node module to help with that</p>
-        <pre>
+        </pre
+    >
+    <p>
+      To use the table u call the file and all the functionality will come with
+      it
+    </p>
+  </div>
+  <div class="code_block" id="database_connect">
+    <h4>Using the database outside the engine</h4>
+    <p>
+      To use the database outside the engine we have made a node module to help
+      with that
+    </p>
+    <pre>
             npm i obsidian-vault
-        </pre>
-        <p>The The Database is always using a port which is specified in the obsidian.config.js</p>
-        <pre>{
+        </pre
+    >
+    <p>
+      The The Database is always using a port which is specified in the
+      obsidian.config.js
+    </p>
+    <pre>
+{
   "name": "An Obsidian App",
-  "view_engine": "html",
-  "port": 3000,
-  "db_port": 27017, // the database port here is 27017
-  "db_name": "obsidian",
-  "db_url": "",
   "mode": "dev",
+  "port": 3000,
   "no_imports": false,
-  "workers": {
-    "api": {
-      "port": 3001,
-      "path": "/api",
-      "enabled": true,
-      "restricted": false
+  "view_engine": "html",
+  "db_port": 6579,
+  "rate_limits": {
+    "enabled": true,
+    "duration": 60,
+    "max": 100
+  },
+  "secure_certs": {
+    "enabled": true,
+    "cert_path": "/certs/knight-smp.xyz_self_signed_cert.pem",
+    "key_path": "/certs/knight-smp.xyz_private_key.pem"
+  },
+  "github_webhook_secret": "92dfac5dc5d99a806aaf39f72454fbf9",
+  "auto_update": true,
+  "asset_dirs": [
+    {
+      "path": "/assets",
+      "url": "/assets"
     }
+  ],
+  "workers": [
+    {
+      "path": "/routes",
+      "baseurl": "/api",
+      "enabled": true
+    }
+  ],
+  "electron": {
+    "version": "27.0.4",
+    "enabled": true,
+    "preload": "pages/preload.js",
+    "modules": [
+      {
+        "name": "main",
+        "file": "./index.js"
+      }
+    ]
   }
 }
-</pre>
-<p> When using the node module we need to set the url to the url of the server where the engine is hosted </p>
-        <p>Example:</p>
-        <pre>
+
+</pre
+    >
+    <p>
+      When using the node module we need to set the url to the url of the server
+      where the engine is hosted
+    </p>
+    <p>Example:</p>
+    <pre>
             const obsidian = require("obsidian-vault")
 obsidian.init("http://localhost:27017").then(async (result) => {
     if (result) {
@@ -95,6 +140,74 @@ obsidian.init("http://localhost:27017").then(async (result) => {
         
     }
     })
-        </pre>
-    </div>
+        </pre
+    >
+  </div>
+  <div class="code_block" id="UsingAssets">
+    <h4>To define an asset directory</h4>
+    <p>You need to put it in your config</p>
+    <pre>
+    "asset_dirs": [
+    {
+      "path": "/assets",
+      "url": "/assets"
+    }
+  ],
+  </pre
+    >
+  </div>
+
+  <div class="code_block" id="usingSSlCerts">
+    <h4>Using SSL Certs</h4>
+    <p>The Obsidian Engine uses SSL Certs</p>
+    <p>which can be created using the command below</p>
+    <pre>
+    npm run create-certs
+  </pre
+    >
+    <p>
+      Keep in mind this ssl cert that is created wont be recognised by browsers,
+      To get around that if your are on a
+      <b>Linux (Ubuntu,Debian,Fedora)</b> You can copy already created certs
+      made by letsencrypt using the command below
+    </p>
+    <pre>
+    npm run copy-certs
+  </pre
+    >
+    <p>
+      This would only work if you already have the certs created by letsencrypt,
+      if not you need to create them using the command below
+    </p>
+    <pre>
+    sudo apt install certbot
+    certbot certonly --standalone --agree-tos -d your-domain-name.com
+  </pre
+    >
+    <p>To enable the ssl certs You need to edit your config</p>
+    <p>
+      To add your own custom certificates the certificates are placed in the
+      <b>.obsidian/server/certs</b> folder
+    </p>
+    <pre>
+    "secure_certs": {
+    "enabled": true,
+    "cert_path": "/certs/knight-smp.xyz_self_signed_cert.pem",
+    "key_path": "/certs/knight-smp.xyz_private_key.pem"
+  },
+  </pre
+    >
+  </div>
+  <div class="code_block" id="applyingRateLimits">
+    <h4>Applying Rate Limits</h4>
+    <p>To apply rate limits You need to edit your config</p>
+    <pre>
+       "rate_limits": {
+    "enabled": true,
+    "duration": 60,
+    "max": 100
+    },
+    </pre>
+    <p>The default is 60 seconds and 100 requests</p>
+  </div>
 </div>
